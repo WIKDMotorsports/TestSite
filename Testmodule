@@ -1,0 +1,101 @@
+import React, { useState, useEffect } from 'react';
+
+// Main App component to demonstrate the TitleModule
+const App = () => {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
+      <TitleModule />
+    </div>
+  );
+};
+
+// TitleModule component with background video and foreground image
+const TitleModule = () => {
+  // State to control the opacity for fade-in effect
+  const [backgroundOpacity, setBackgroundOpacity] = useState(0);
+  const [foregroundOpacity, setForegroundOpacity] = useState(0);
+
+  // State to control the scale for hover effect
+  const [isBackgroundHovered, setIsBackgroundHovered] = useState(false);
+  const [isForegroundHovered, setIsForegroundHovered] = useState(false);
+
+  // UseEffect for managing the fade-in sequence
+  useEffect(() => {
+    // Fade in foreground first
+    const foregroundFadeInTimer = setTimeout(() => {
+      setForegroundOpacity(1);
+    }, 200); // Foreground starts fading in after 200ms
+
+    // Then fade in background after a slight delay
+    const backgroundFadeInTimer = setTimeout(() => {
+      setBackgroundOpacity(1);
+    }, 800); // Background starts fading in after 800ms (200ms + 600ms delay from foreground)
+
+    // Cleanup timers on component unmount
+    return () => {
+      clearTimeout(foregroundFadeInTimer);
+      clearTimeout(backgroundFadeInTimer);
+    };
+  }, []); // Run once on component mount
+
+  return (
+    // The main container for the title module.
+    // It is now strictly set to 683px width and 270px height to match your media.
+    // The `maxWidth` and `maxHeight` properties have been removed,
+    // so it will no longer react to the size of the embedding boundary.
+    // `aspectRatio` is adjusted to reflect the new dimensions.
+    <div
+      className="relative mx-auto overflow-hidden flex items-center justify-center"
+      style={{
+        width: '683px',   // Corrected fixed width
+        height: '270px',  // Corrected fixed height
+        aspectRatio: '683 / 270', // Updated aspect ratio
+      }}
+    >
+      {/* Background Video Layer */}
+      <video
+        src="https://github.com/WIKDMotorsports/TestSite/raw/refs/heads/main/Medium_large_Titanium_flecks.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline // Ensures video plays inline on mobile
+        className={`
+          absolute top-0 left-0 w-full h-full object-cover z-0
+          transition-all duration-1000 ease-in-out
+          ${isBackgroundHovered ? 'scale-110' : 'scale-100'}
+        `}
+        style={{ opacity: backgroundOpacity, transitionDuration: '1000ms', transitionTimingFunction: 'ease-in-out' }}
+        onMouseEnter={() => setIsBackgroundHovered(true)}
+        onMouseLeave={() => setIsBackgroundHovered(false)}
+      >
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Foreground Image Layer */}
+      <img
+        src="https://github.com/WIKDMotorsports/TestSite/raw/refs/heads/main/TitaniumText.webp"
+        alt="Foreground Layer"
+        className={`
+          absolute z-10 cursor-pointer
+          transition-transform duration-300 ease-out
+          ${isForegroundHovered ? 'scale-105' : 'scale-100'}
+        `}
+        style={{
+          opacity: foregroundOpacity,
+          transitionDuration: '800ms',
+          transitionTimingFunction: 'ease-in',
+          top: '50%',        // Position from top center
+          left: '50%',       // Position from left center
+          transform: `translate(-50%, -50%) scale(${isForegroundHovered ? 1.05 : 1})`, // Adjust transform for centering and scaling
+          width: '100%',     // Ensure the image element spans the full width of the fixed parent
+          height: '100%',    // Ensure the image element spans the full height of the fixed parent
+          objectFit: 'contain' // Use object-contain to scale the content within the centered element
+        }}
+        onMouseEnter={() => setIsForegroundHovered(true)}
+        onMouseLeave={() => setIsForegroundHovered(false)}
+      />
+    </div>
+  );
+};
+
+export default App;
