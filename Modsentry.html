@@ -33,6 +33,11 @@
         .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; max-width: 56rem; }
         .p-4 { padding: 1rem; }
         .p-8 { padding: 2rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-4 { margin-top: 1rem; }
@@ -148,12 +153,13 @@
         }
         .mod-card .card-footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            gap: 0.5rem;
             margin-top: 0.75rem;
             padding-top: 0.75rem;
             border-top: 1px solid var(--color-border);
         }
-        .delete-btn {
+        .card-btn {
             background: none;
             border: none;
             color: var(--color-text-muted);
@@ -165,7 +171,10 @@
             border-radius: 4px;
             transition: all 0.2s ease;
         }
+        .card-btn:hover { color: var(--color-text); background-color: rgba(255,255,255,0.06); }
         .delete-btn:hover { color: var(--color-danger); background-color: rgba(239, 68, 68, 0.1); }
+        .save-btn:hover { color: var(--color-success); background-color: rgba(34, 197, 94, 0.1); }
+        .edit-fields input, .edit-fields textarea { font-size: 0.875rem; }
 
         #statusBadge {
             font-size: 0.75rem;
@@ -265,6 +274,15 @@
             return div.innerHTML;
         }
 
+        function escapeAttr(str) {
+            return escapeHtml(str).replace(/"/g, '&quot;');
+        }
+
+        function buildTitle(data) {
+            const parts = [data.year, data.make, data.model].filter(Boolean);
+            return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
+        }
+
         function renderMods(entries) {
             modGrid.innerHTML = '';
             if (entries.length === 0) {
@@ -276,28 +294,79 @@
             entries.forEach(({ id, data }) => {
                 const card = document.createElement('div');
                 card.className = 'mod-card';
-
-                let hpLine = '';
-                if (data.startHp || data.endHp) {
-                    const start = data.startHp || '?';
-                    const end = data.endHp || '?';
-                    hpLine = `<div class="hp-line">${escapeHtml(start)} HP &rarr; ${escapeHtml(end)} HP</div>`;
-                }
-
-                const titleParts = [data.year, data.make, data.model].filter(Boolean);
-                const title = titleParts.length > 0 ? titleParts.join(' ') : (data.ymm || 'Untitled Build');
-
-                card.innerHTML = `
-                    <h3>${escapeHtml(title)}</h3>
-                    ${hpLine}
-                    <p class="mods-text">${escapeHtml(data.mods || 'No mods listed.')}</p>
-                    <div class="card-footer">
-                        <button class="delete-btn" data-id="${id}">Delete</button>
-                    </div>
-                `;
-                card.querySelector('.delete-btn').addEventListener('click', () => deleteEntry(id));
                 modGrid.appendChild(card);
+                renderViewCard(card, id, data);
             });
+        }
+
+        function renderViewCard(card, id, data) {
+            let hpLine = '';
+            if (data.startHp || data.endHp) {
+                const start = data.startHp || '?';
+                const end = data.endHp || '?';
+                hpLine = `<div class="hp-line">${escapeHtml(start)} HP &rarr; ${escapeHtml(end)} HP</div>`;
+            }
+
+            card.innerHTML = `
+                <h3>${escapeHtml(buildTitle(data))}</h3>
+                ${hpLine}
+                <p class="mods-text">${escapeHtml(data.mods || 'No mods listed.')}</p>
+                <div class="card-footer">
+                    <button class="card-btn edit-btn">Edit</button>
+                    <button class="card-btn delete-btn">Delete</button>
+                </div>
+            `;
+            card.querySelector('.edit-btn').addEventListener('click', () => renderEditCard(card, id, data));
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteEntry(id));
+        }
+
+        function renderEditCard(card, id, data) {
+            card.innerHTML = `
+                <div class="edit-fields space-y-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || '')}">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="number" class="form-element px-2 py-2 edit-startHp" placeholder="Start HP" value="${escapeAttr(data.startHp || '')}">
+                        <input type="number" class="form-element px-2 py-2 edit-endHp" placeholder="End HP" value="${escapeAttr(data.endHp || '')}">
+                    </div>
+                    <textarea class="form-element w-full px-2 py-2 edit-mods" rows="3" placeholder="Modifications">${escapeHtml(data.mods || '')}</textarea>
+                </div>
+                <div class="card-footer">
+                    <button class="card-btn cancel-btn">Cancel</button>
+                    <button class="card-btn save-btn">Save</button>
+                </div>
+            `;
+            card.querySelector('.cancel-btn').addEventListener('click', () => renderViewCard(card, id, data));
+            card.querySelector('.save-btn').addEventListener('click', () => handleSaveEdit(card, id, data));
+        }
+
+        async function handleSaveEdit(card, id, originalData) {
+            const updated = {
+                year: card.querySelector('.edit-year').value.trim(),
+                make: card.querySelector('.edit-make').value.trim(),
+                model: card.querySelector('.edit-model').value.trim(),
+                startHp: card.querySelector('.edit-startHp').value,
+                endHp: card.querySelector('.edit-endHp').value,
+                mods: card.querySelector('.edit-mods').value,
+                createdAt: originalData.createdAt || Date.now()
+            };
+
+            if (!updated.make || !updated.model) {
+                flashMessage('Make and Model are required.', true);
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, COLLECTION_NAME, id), updated);
+                renderViewCard(card, id, updated);
+                flashMessage('Updated!', false);
+            } catch (err) {
+                console.error(err);
+                flashMessage('Update failed: ' + err.message, true);
+            }
         }
 
         async function loadMods() {
