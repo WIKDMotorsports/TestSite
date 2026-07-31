@@ -67,7 +67,10 @@
         .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 640px) {
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
         @media (min-width: 768px) { .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
         .form-element {
@@ -194,7 +197,11 @@
 
             <div class="space-y-6">
                 <form id="modForm" class="space-y-4">
-                    <input type="text" id="ymm" placeholder="Year Make Model (e.g. 2022 C7Z)" required class="form-element w-full px-4 py-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
+                        <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
+                        <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
                         <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
@@ -277,8 +284,11 @@
                     hpLine = `<div class="hp-line">${escapeHtml(start)} HP &rarr; ${escapeHtml(end)} HP</div>`;
                 }
 
+                const titleParts = [data.year, data.make, data.model].filter(Boolean);
+                const title = titleParts.length > 0 ? titleParts.join(' ') : (data.ymm || 'Untitled Build');
+
                 card.innerHTML = `
-                    <h3>${escapeHtml(data.ymm || 'Untitled Build')}</h3>
+                    <h3>${escapeHtml(title)}</h3>
                     ${hpLine}
                     <p class="mods-text">${escapeHtml(data.mods || 'No mods listed.')}</p>
                     <div class="card-footer">
@@ -318,11 +328,15 @@
 
         modForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const ymm = document.getElementById('ymm').value.trim();
-            if (!ymm) return;
+            const year = document.getElementById('year').value.trim();
+            const make = document.getElementById('make').value.trim();
+            const model = document.getElementById('model').value.trim();
+            if (!make || !model) return;
 
             const newEntry = {
-                ymm,
+                year,
+                make,
+                model,
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
