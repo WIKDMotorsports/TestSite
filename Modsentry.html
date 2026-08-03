@@ -84,10 +84,11 @@
             color: var(--color-text);
             border-radius: 8px;
             transition: all 0.2s ease-in-out;
+            font-family: var(--font-body);
         }
         .form-element:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
             border-color: var(--color-primary);
         }
         .form-element::placeholder { color: var(--color-text-muted); }
@@ -176,6 +177,9 @@
         .save-btn:hover { color: var(--color-success); background-color: rgba(34, 197, 94, 0.1); }
         .edit-fields input, .edit-fields textarea { font-size: 0.875rem; }
 
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+
         #statusBadge {
             font-size: 0.75rem;
             font-family: var(--font-body);
@@ -216,6 +220,22 @@
                         <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
                     </div>
                     <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-4 py-3"></textarea>
+
+                    <!-- Expandable Customer & Extra Info Section -->
+                    <details class="border rounded-lg" style="border-color: var(--color-border);">
+                        <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted);">
+                            + Add Customer Data & Post-Tune Info (Optional)
+                        </summary>
+                        <div class="p-4 space-y-4" style="border-top: 1px solid var(--color-border); background-color: #0A0A0A; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-4 py-3">
+                                <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-4 py-3">
+                            </div>
+                            <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                            <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                        </div>
+                    </details>
+
                     <button type="submit" id="addBtn" disabled class="btn btn-primary w-full justify-center">Add to List</button>
                 </form>
 
@@ -231,7 +251,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { initializeFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Same Firebase project as the Daily Activity Logger.
         const firebaseConfig = {
             apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
             authDomain: "activity-log-7d4d6.firebaseapp.com",
@@ -242,7 +261,6 @@
             measurementId: "G-VJEJDWM1NW"
         };
 
-        // Its own section, alongside "activity_logs" — not nested inside it.
         const COLLECTION_NAME = "vehicle_mods";
 
         const statusBadge = document.getElementById('statusBadge');
@@ -279,7 +297,7 @@
         }
 
         function buildTitle(data) {
-            const parts = [data.year, data.make, data.model].filter(Boolean);
+            const parts = [data.year || data.vehicleYear, data.make || data.vehicleMake, data.model || data.vehicleModel].filter(Boolean);
             return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
         }
 
@@ -307,10 +325,31 @@
                 hpLine = `<div class="hp-line">${escapeHtml(start)} HP &rarr; ${escapeHtml(end)} HP</div>`;
             }
 
+            let customerHtml = '';
+            if (data.customerName || data.customerInstagram) {
+                const name = data.customerName ? escapeHtml(data.customerName) : '';
+                const ig = data.customerInstagram ? escapeHtml(data.customerInstagram) : '';
+                customerHtml = `<div class="text-xs mb-2" style="color: var(--color-primary); font-weight: 600;">
+                    👤 ${name} ${ig ? `(${ig})` : ''}
+                </div>`;
+            }
+
+            let extraHtml = '';
+            if (data.futureGoals) {
+                extraHtml += `<div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Future Goals:</strong><p class="mods-text">${escapeHtml(data.futureGoals)}</p></div>`;
+            }
+            if (data.postTuneComments) {
+                extraHtml += `<div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Post-Tune Comments:</strong><p class="mods-text">${escapeHtml(data.postTuneComments)}</p></div>`;
+            }
+
+            const activeMods = data.mods || data.priorMods || 'No mods listed.';
+
             card.innerHTML = `
                 <h3>${escapeHtml(buildTitle(data))}</h3>
+                ${customerHtml}
                 ${hpLine}
-                <p class="mods-text">${escapeHtml(data.mods || 'No mods listed.')}</p>
+                <div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Mods:</strong><p class="mods-text">${escapeHtml(activeMods)}</p></div>
+                ${extraHtml}
                 <div class="card-footer">
                     <button class="card-btn edit-btn">Edit</button>
                     <button class="card-btn delete-btn">Delete</button>
@@ -324,15 +363,23 @@
             card.innerHTML = `
                 <div class="edit-fields space-y-2">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || '')}">
+                        <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || data.vehicleYear || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || data.vehicleMake || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || data.vehicleModel || '')}">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <input type="number" class="form-element px-2 py-2 edit-startHp" placeholder="Start HP" value="${escapeAttr(data.startHp || '')}">
                         <input type="number" class="form-element px-2 py-2 edit-endHp" placeholder="End HP" value="${escapeAttr(data.endHp || '')}">
                     </div>
-                    <textarea class="form-element w-full px-2 py-2 edit-mods" rows="3" placeholder="Modifications">${escapeHtml(data.mods || '')}</textarea>
+                    <textarea class="form-element w-full px-2 py-2 edit-mods" rows="2" placeholder="Modifications">${escapeHtml(data.mods || data.priorMods || '')}</textarea>
+                    
+                    <div class="text-xs uppercase mt-2" style="color: var(--color-text-muted); font-weight: 600;">Customer & Extra Info</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="text" class="form-element px-2 py-2 edit-custName" placeholder="Customer Name" value="${escapeAttr(data.customerName || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-custIg" placeholder="Instagram" value="${escapeAttr(data.customerInstagram || '')}">
+                    </div>
+                    <textarea class="form-element w-full px-2 py-2 edit-future" rows="2" placeholder="Future Goals">${escapeHtml(data.futureGoals || '')}</textarea>
+                    <textarea class="form-element w-full px-2 py-2 edit-postTune" rows="2" placeholder="Post-Tune Comments">${escapeHtml(data.postTuneComments || '')}</textarea>
                 </div>
                 <div class="card-footer">
                     <button class="card-btn cancel-btn">Cancel</button>
@@ -351,6 +398,10 @@
                 startHp: card.querySelector('.edit-startHp').value,
                 endHp: card.querySelector('.edit-endHp').value,
                 mods: card.querySelector('.edit-mods').value,
+                customerName: card.querySelector('.edit-custName').value.trim(),
+                customerInstagram: card.querySelector('.edit-custIg').value.trim(),
+                futureGoals: card.querySelector('.edit-future').value.trim(),
+                postTuneComments: card.querySelector('.edit-postTune').value.trim(),
                 createdAt: originalData.createdAt || Date.now()
             };
 
@@ -409,6 +460,10 @@
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
+                customerName: document.getElementById('custName').value.trim(),
+                customerInstagram: document.getElementById('custIg').value.trim(),
+                futureGoals: document.getElementById('futureGoals').value.trim(),
+                postTuneComments: document.getElementById('postTuneComments').value.trim(),
                 createdAt: Date.now()
             };
 
@@ -417,6 +472,11 @@
                 const docRef = doc(collection(db, COLLECTION_NAME), Date.now().toString());
                 await setDoc(docRef, newEntry);
                 modForm.reset();
+                
+                // Collapse details panel if open
+                const detailsPanel = modForm.querySelector('details');
+                if (detailsPanel) detailsPanel.open = false;
+
                 await loadMods();
                 flashMessage('Added!', false);
             } catch (err) {
