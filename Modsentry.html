@@ -76,7 +76,13 @@
             .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
-        @media (min-width: 768px) { .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (min-width: 768px) { 
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } 
+            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
 
         .form-element {
             background-color: var(--color-surface);
@@ -210,10 +216,13 @@
 
             <div class="space-y-6">
                 <form id="modForm" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Adjusted Grid to fit 4 elements seamlessly on tablet/desktop -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
                         <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
                         <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
+                        <!-- New Trim Input added here -->
+                        <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-4 py-3">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
@@ -296,8 +305,14 @@
             return escapeHtml(str).replace(/"/g, '&quot;');
         }
 
+        // Updated buildTitle to include trim alongside year, make, and model
         function buildTitle(data) {
-            const parts = [data.year || data.vehicleYear, data.make || data.vehicleMake, data.model || data.vehicleModel].filter(Boolean);
+            const parts = [
+                data.year || data.vehicleYear, 
+                data.make || data.vehicleMake, 
+                data.model || data.vehicleModel,
+                data.trim || data.vehicleTrim // Adds trim onto the end
+            ].filter(Boolean);
             return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
         }
 
@@ -362,10 +377,12 @@
         function renderEditCard(card, id, data) {
             card.innerHTML = `
                 <div class="edit-fields space-y-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <!-- Adjusted Edit Fields to include Trim layout -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                         <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || data.vehicleYear || '')}">
                         <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || data.vehicleMake || '')}">
                         <input type="text" class="form-element px-2 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || data.vehicleModel || '')}">
+                        <input type="text" class="form-element px-2 py-2 edit-trim" placeholder="Trim" value="${escapeAttr(data.trim || data.vehicleTrim || '')}">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <input type="number" class="form-element px-2 py-2 edit-startHp" placeholder="Start HP" value="${escapeAttr(data.startHp || '')}">
@@ -395,6 +412,7 @@
                 year: card.querySelector('.edit-year').value.trim(),
                 make: card.querySelector('.edit-make').value.trim(),
                 model: card.querySelector('.edit-model').value.trim(),
+                trim: card.querySelector('.edit-trim').value.trim(), // Saving trim from edit view
                 startHp: card.querySelector('.edit-startHp').value,
                 endHp: card.querySelector('.edit-endHp').value,
                 mods: card.querySelector('.edit-mods').value,
@@ -451,12 +469,15 @@
             const year = document.getElementById('year').value.trim();
             const make = document.getElementById('make').value.trim();
             const model = document.getElementById('model').value.trim();
+            const trim = document.getElementById('trim').value.trim(); // Capture trim
+
             if (!make || !model) return;
 
             const newEntry = {
                 year,
                 make,
                 model,
+                trim, // Save trim into Firebase
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
