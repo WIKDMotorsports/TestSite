@@ -257,9 +257,6 @@
             background-color: var(--color-surface);
             color: var(--color-text-muted);
         }
-        .obs-settings input {
-            font-size: 0.8rem;
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -291,15 +288,13 @@
                         </button>
                     </div>
 
-                    <details class="obs-settings">
-                        <summary class="text-xs cursor-pointer" style="color: var(--color-text-muted);">Bridge server connection</summary>
-                        <div class="mt-2">
-                            <input type="text" id="bridgeUrl" class="form-element w-full px-2 py-2" placeholder="http://192.168.0.XX:5005">
-                        </div>
+                    <div class="mt-2">
+                        <label class="text-xs" style="color: var(--color-text-muted);">Bridge Server URL</label>
+                        <input type="text" id="bridgeUrl" class="form-element w-full px-2 py-2 mt-1" placeholder="http://192.168.0.XX:5005">
                         <p class="text-xs mt-1" style="color: var(--color-text-muted);">
-                            This is the LAN address of the PC running OBS + the obs_bridge_server.py bridge script (default port 5005). Not saved anywhere &mdash; re-enter after reload, or hardcode a default in DEFAULT_BRIDGE_URL in the script.
+                            Auto-filled with your OBS PC's address. Edit it if the badge above says "Unreachable".
                         </p>
-                    </details>
+                    </div>
                 </div>
 
                 <form id="modForm" class="space-y-4">
@@ -374,13 +369,16 @@
         // running on the SAME PC as OBS. That bridge does the actual OBS
         // websocket talking over localhost; this page just calls it over
         // plain HTTP across the LAN. See obs_bridge_server.py for setup.
-        const DEFAULT_BRIDGE_URL = ''; // e.g. 'http://192.168.0.42:5005' - hardcode if you want a default
+        // Confirmed: the OBS PC's Metro network address.
+        const BRIDGE_CANDIDATES = [
+            'http://192.168.1.123:5005'
+        ];
 
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
         const bridgeUrlInput = document.getElementById('bridgeUrl');
-        bridgeUrlInput.value = DEFAULT_BRIDGE_URL;
+        bridgeUrlInput.value = BRIDGE_CANDIDATES[0];
 
         let activeRecordingLabel = null; // 'loading' | 'dyno' | null
 
@@ -466,9 +464,32 @@
             }
         });
 
+        async function pingCandidate(url) {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 1500);
+                const res = await fetch(url + '/status', { signal: controller.signal });
+                clearTimeout(timeout);
+                return res.ok;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        async function autoDiscoverBridge() {
+            setObsBadge('Searching...', '#a1a1aa');
+            for (const candidate of BRIDGE_CANDIDATES) {
+                if (await pingCandidate(candidate)) {
+                    bridgeUrlInput.value = candidate;
+                    setObsBadge('Connected', '#22c55e');
+                    return;
+                }
+            }
+            setObsBadge('Unreachable', '#ef4444');
+        }
+
         bridgeUrlInput.addEventListener('change', checkBridgeStatus);
-        if (DEFAULT_BRIDGE_URL) checkBridgeStatus();
-        else setObsBadge('Not configured', '#a1a1aa');
+        autoDiscoverBridge();
         // ---------------- END OBS RECORDING CONTROLS ----------------
 
         function setBadge(msg, color) {
