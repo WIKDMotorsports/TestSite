@@ -201,6 +201,65 @@
             font-size: 0.875rem;
             padding: 2rem 1rem;
         }
+
+        /* --- OBS Recording Controls --- */
+        .rec-panel {
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            background-color: #0A0A0A;
+        }
+        .rec-btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .rec-btn {
+            flex: 1 1 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            border-radius: 8px;
+            padding: 14px 16px;
+            cursor: pointer;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            transition: all 0.2s ease;
+        }
+        .rec-btn:hover:not(:disabled) { border-color: var(--color-primary); }
+        .rec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .rec-btn.is-recording {
+            background-color: rgba(239, 68, 68, 0.15);
+            border-color: var(--color-danger);
+            color: #fff;
+        }
+        .rec-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background-color: var(--color-text-muted);
+            flex-shrink: 0;
+        }
+        .rec-btn.is-recording .rec-dot {
+            background-color: var(--color-danger);
+            animation: rec-pulse 1.2s infinite ease-in-out;
+        }
+        @keyframes rec-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+        #obsBadge {
+            font-size: 0.75rem;
+            font-family: var(--font-body);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-surface);
+            color: var(--color-text-muted);
+        }
+        .obs-settings input {
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -215,6 +274,36 @@
             </div>
 
             <div class="space-y-6">
+
+                <!-- OBS Recording Controls -->
+                <div class="rec-panel space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase" style="color: var(--color-text-muted);">Recording Controls</h2>
+                        <div id="obsBadge">OBS: Idle</div>
+                    </div>
+
+                    <div class="rec-btn-row">
+                        <button type="button" id="loadingRecBtn" class="rec-btn">
+                            <span class="rec-dot"></span> Start Loading Recording
+                        </button>
+                        <button type="button" id="dynoRecBtn" class="rec-btn">
+                            <span class="rec-dot"></span> Start Dyno Pull Recording
+                        </button>
+                    </div>
+
+                    <details class="obs-settings">
+                        <summary class="text-xs cursor-pointer" style="color: var(--color-text-muted);">OBS connection settings</summary>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
+                            <input type="text" id="obsHost" class="form-element px-2 py-2" placeholder="Host (e.g. localhost)">
+                            <input type="number" id="obsPort" class="form-element px-2 py-2" placeholder="Port (4455)">
+                            <input type="password" id="obsPassword" class="form-element px-2 py-2" placeholder="Password (if set)">
+                        </div>
+                        <p class="text-xs mt-1" style="color: var(--color-text-muted);">
+                            Enable this in OBS under Tools &rarr; WebSocket Server Settings. These fields are not saved anywhere &mdash; re-enter them if you reload the page, or hardcode defaults in OBS_CONFIG in the script.
+                        </p>
+                    </details>
+                </div>
+
                 <form id="modForm" class="space-y-4">
                     <!-- Adjusted Grid to fit 4 elements seamlessly on tablet/desktop -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -281,6 +370,202 @@
 
         let db;
         let statusTimeout;
+
+        // ---------------- OBS RECORDING CONTROLS ----------------
+        // Requires OBS 28+ with its built-in WebSocket server turned on
+        // (Tools -> WebSocket Server Settings). This talks the real
+        // obs-websocket v5 protocol directly over a browser WebSocket -
+        // no external library needed.
+        //
+        // IMPORTANT - mixed content: this page needs to be opened as a
+        // local file or served over plain http for a ws:// connection to
+        // a LAN OBS_HOST to work reliably. If this page is loaded over
+        // https (e.g. via a hosted preview) and OBS is NOT on "localhost",
+        // most browsers will block the ws:// connection as mixed content.
+        // "localhost" itself is exempt from that block in Chrome/Edge.
+        const OBS_CONFIG = {
+            host: 'localhost',   // change if OBS runs on a different PC
+            port: 4455,          // default obs-websocket v5 port
+            password: ''         // fill in if your OBS websocket has a password
+        };
+
+        // These exact folders come from your automation pipeline's TARGET_DIR structure.
+        const FOLDER_LOADING = '\\\\TRUENAS\\ElyasStephens\\Automation\\Tests\\RawRecording\\Loading';
+        const FOLDER_DYNO    = '\\\\TRUENAS\\ElyasStephens\\Automation\\Tests\\RawRecording\\Dyno Run';
+
+        const obsBadge = document.getElementById('obsBadge');
+        const loadingRecBtn = document.getElementById('loadingRecBtn');
+        const dynoRecBtn = document.getElementById('dynoRecBtn');
+        const obsHostInput = document.getElementById('obsHost');
+        const obsPortInput = document.getElementById('obsPort');
+        const obsPasswordInput = document.getElementById('obsPassword');
+        obsHostInput.value = OBS_CONFIG.host;
+        obsPortInput.value = OBS_CONFIG.port;
+
+        function setObsBadge(msg, color) {
+            obsBadge.textContent = 'OBS: ' + msg;
+            obsBadge.style.color = color || 'var(--color-text-muted)';
+            obsBadge.style.borderColor = color || 'var(--color-border)';
+        }
+
+        // --- crypto helpers required by the obs-websocket v5 auth handshake ---
+        function toBase64(bytes) {
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+            return btoa(binary);
+        }
+        async function sha256(str) {
+            const data = new TextEncoder().encode(str);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return new Uint8Array(digest);
+        }
+        async function computeAuthString(password, salt, challenge) {
+            const secret1 = await sha256(password + salt);
+            const base64Secret1 = toBase64(secret1);
+            const secret2 = await sha256(base64Secret1 + challenge);
+            return toBase64(secret2);
+        }
+
+        class ObsClient {
+            constructor() {
+                this.ws = null;
+                this.identified = false;
+                this.pending = new Map(); // requestId -> {resolve, reject}
+                this.reqCounter = 0;
+            }
+
+            isConnected() {
+                return this.ws && this.ws.readyState === WebSocket.OPEN && this.identified;
+            }
+
+            async connect() {
+                if (this.isConnected()) return;
+                const host = obsHostInput.value.trim() || OBS_CONFIG.host;
+                const port = obsPortInput.value.trim() || OBS_CONFIG.port;
+                const password = obsPasswordInput.value || OBS_CONFIG.password;
+
+                setObsBadge('Connecting...', '#a1a1aa');
+
+                await new Promise((resolve, reject) => {
+                    this.ws = new WebSocket(`ws://${host}:${port}`);
+
+                    this.ws.onmessage = async (event) => {
+                        const msg = JSON.parse(event.data);
+                        // op 0 = Hello
+                        if (msg.op === 0) {
+                            const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+                            if (msg.d.authentication) {
+                                identify.authentication = await computeAuthString(
+                                    password, msg.d.authentication.salt, msg.d.authentication.challenge
+                                );
+                            }
+                            this.ws.send(JSON.stringify({ op: 1, d: identify }));
+                        }
+                        // op 2 = Identified (handshake complete)
+                        else if (msg.op === 2) {
+                            this.identified = true;
+                            setObsBadge('Connected', '#22c55e');
+                            resolve();
+                        }
+                        // op 7 = RequestResponse
+                        else if (msg.op === 7) {
+                            const p = this.pending.get(msg.d.requestId);
+                            if (p) {
+                                this.pending.delete(msg.d.requestId);
+                                if (msg.d.requestStatus.result) {
+                                    p.resolve(msg.d.responseData || {});
+                                } else {
+                                    p.reject(new Error(msg.d.requestStatus.comment || 'OBS request failed'));
+                                }
+                            }
+                        }
+                    };
+
+                    this.ws.onerror = () => {
+                        setObsBadge('Connection error', '#ef4444');
+                        reject(new Error('Could not reach OBS websocket at ' + host + ':' + port));
+                    };
+
+                    this.ws.onclose = () => {
+                        this.identified = false;
+                        setObsBadge('Disconnected', '#ef4444');
+                    };
+                });
+            }
+
+            async request(requestType, requestData) {
+                if (!this.isConnected()) await this.connect();
+                const requestId = 'req_' + (this.reqCounter++);
+                return new Promise((resolve, reject) => {
+                    this.pending.set(requestId, { resolve, reject });
+                    this.ws.send(JSON.stringify({
+                        op: 6,
+                        d: { requestType, requestId, requestData }
+                    }));
+                });
+            }
+        }
+
+        const obs = new ObsClient();
+        let activeRecordingLabel = null; // 'loading' | 'dyno' | null
+
+        // Builds an OBS filename-format string OBS will use for the NEXT
+        // recording it starts, e.g. "loading_%CCYY-%MM-%DD_%hh-%mm-%ss".
+        // This is how the file gets named correctly without needing any
+        // filesystem access from the browser (which isn't possible here).
+        function filenameFormatFor(prefix) {
+            return `${prefix}_%CCYY-%MM-%DD_%hh-%mm-%ss`;
+        }
+
+        async function startRecording(folder, prefix, label, button, otherButton) {
+            try {
+                await obs.request('SetRecordDirectory', { recordDirectory: folder });
+                await obs.request('SetProfileParameter', {
+                    parameterCategory: 'Output',
+                    parameterName: 'FilenameFormatting',
+                    parameterValue: filenameFormatFor(prefix)
+                });
+                await obs.request('StartRecord');
+                activeRecordingLabel = label;
+                button.classList.add('is-recording');
+                button.lastChild.textContent = ` Stop ${label === 'loading' ? 'Loading' : 'Dyno Pull'} Recording`;
+                otherButton.disabled = true;
+                flashMessage(`Recording ${label}...`, false);
+            } catch (err) {
+                console.error(err);
+                flashMessage('OBS start failed: ' + err.message, true);
+            }
+        }
+
+        async function stopRecording(label, button, otherButton) {
+            try {
+                const resp = await obs.request('StopRecord');
+                activeRecordingLabel = null;
+                button.classList.remove('is-recording');
+                button.lastChild.textContent = ` Start ${label === 'loading' ? 'Loading' : 'Dyno Pull'} Recording`;
+                otherButton.disabled = false;
+                flashMessage('Saved: ' + (resp.outputPath || '(check OBS for file path)'), false);
+            } catch (err) {
+                console.error(err);
+                flashMessage('OBS stop failed: ' + err.message, true);
+            }
+        }
+
+        loadingRecBtn.addEventListener('click', () => {
+            if (activeRecordingLabel === 'loading') {
+                stopRecording('loading', loadingRecBtn, dynoRecBtn);
+            } else {
+                startRecording(FOLDER_LOADING, 'loading', 'loading', loadingRecBtn, dynoRecBtn);
+            }
+        });
+        dynoRecBtn.addEventListener('click', () => {
+            if (activeRecordingLabel === 'dyno') {
+                stopRecording('dyno', dynoRecBtn, loadingRecBtn);
+            } else {
+                startRecording(FOLDER_DYNO, 'dyno_pull', 'dyno', dynoRecBtn, loadingRecBtn);
+            }
+        });
+        // ---------------- END OBS RECORDING CONTROLS ----------------
 
         function setBadge(msg, color) {
             statusBadge.textContent = msg;
