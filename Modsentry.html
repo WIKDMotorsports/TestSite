@@ -1,346 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Mod Tracker</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --color-background: #0A0A0A;
-            --color-text: #EAEAEA;
-            --color-text-muted: #a1a1aa;
-            --color-primary: #FF3B30;
-            --color-success: #22c55e;
-            --color-surface: #141414;
-            --color-border: #2A2A2A;
-            --color-danger: #ef4444;
-            --font-heading: 'Rajdhani', sans-serif;
-            --font-body: 'Inter', sans-serif;
-        }
-        html { box-sizing: border-box; }
-        *, *:before, *:after { box-sizing: inherit; }
-        body {
-            font-family: var(--font-body);
-            background-color: var(--color-background);
-            color: var(--color-text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            margin: 0;
-        }
-        .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; max-width: 56rem; }
-        .p-4 { padding: 1rem; }
-        .p-8 { padding: 2rem; }
-        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .mt-1 { margin-top: 0.25rem; }
-        .mt-2 { margin-top: 0.5rem; }
-        .mt-4 { margin-top: 1rem; }
-        .mb-1 { margin-bottom: 0.25rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .bg-surface { background-color: var(--color-surface); }
-        .border { border-width: 1px; border-style: solid; border-color: var(--color-border); }
-        .rounded-lg { border-radius: 0.5rem; }
-        .rounded-xl { border-radius: 0.75rem; }
-        .rounded-2xl { border-radius: 1rem; }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-        .text-center { text-align: center; }
-        .text-white { color: #fff; }
-        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .text-xs { font-size: 0.75rem; line-height: 1rem; }
-        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        .font-bold { font-weight: 700; }
-        .font-semibold { font-weight: 600; }
-        .uppercase { text-transform: uppercase; }
-        .grid { display: grid; }
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .gap-2 { gap: 0.5rem; }
-        .gap-4 { gap: 1rem; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
-        .flex-shrink-0 { flex-shrink: 0; }
-        .w-full { width: 100%; }
-        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
-        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-        .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-        @media (min-width: 640px) {
-            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        }
-        @media (min-width: 768px) { 
-            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } 
-            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        }
-        @media (min-width: 1024px) {
-            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        }
-
-        .form-element {
-            background-color: var(--color-surface);
-            border: 1px solid var(--color-border);
-            color: var(--color-text);
-            border-radius: 8px;
-            transition: all 0.2s ease-in-out;
-            font-family: var(--font-body);
-        }
-        .form-element:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
-            border-color: var(--color-primary);
-        }
-        .form-element::placeholder { color: var(--color-text-muted); }
-
-        .btn {
-            font-family: var(--font-heading);
-            font-weight: 600;
-            font-size: 18px;
-            text-transform: uppercase;
-            border-radius: 8px;
-            padding: 12px 24px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #E03024;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
-        }
-        .btn-secondary {
-            background-color: var(--color-surface);
-            color: var(--color-primary);
-            border-color: var(--color-primary);
-        }
-        .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
-
-        .mod-card {
-            background-color: #0A0A0A;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
-        }
-        .mod-card h3 {
-            margin: 0 0 0.25rem 0;
-            font-family: var(--font-heading);
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--color-text);
-        }
-        .mod-card .hp-line {
-            font-size: 0.875rem;
-            color: var(--color-success);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .mod-card .mods-text {
-            font-size: 0.875rem;
-            color: var(--color-text-muted);
-            white-space: pre-line;
-            margin: 0;
-        }
-        .mod-card .card-footer {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--color-border);
-        }
-        .card-btn {
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        .card-btn:hover { color: var(--color-text); background-color: rgba(255,255,255,0.06); }
-        .delete-btn:hover { color: var(--color-danger); background-color: rgba(239, 68, 68, 0.1); }
-        .save-btn:hover { color: var(--color-success); background-color: rgba(34, 197, 94, 0.1); }
-        .edit-fields input, .edit-fields textarea { font-size: 0.875rem; }
-
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-
-        #statusBadge {
-            font-size: 0.75rem;
-            font-family: var(--font-body);
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            color: var(--color-text-muted);
-        }
-        #emptyState {
-            text-align: center;
-            color: var(--color-text-muted);
-            font-size: 0.875rem;
-            padding: 2rem 1rem;
-        }
-
-        /* --- OBS Recording Controls --- */
-        .rec-panel {
-            border: 1px solid var(--color-border);
-            border-radius: 0.75rem;
-            padding: 1rem 1.25rem;
-            background-color: #0A0A0A;
-        }
-        .rec-btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        .rec-btn {
-            flex: 1 1 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            border-radius: 8px;
-            padding: 14px 16px;
-            cursor: pointer;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            color: var(--color-text);
-            transition: all 0.2s ease;
-        }
-        .rec-btn:hover:not(:disabled) { border-color: var(--color-primary); }
-        .rec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .rec-btn.is-recording {
-            background-color: rgba(239, 68, 68, 0.15);
-            border-color: var(--color-danger);
-            color: #fff;
-        }
-        .rec-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background-color: var(--color-text-muted);
-            flex-shrink: 0;
-        }
-        .rec-btn.is-recording .rec-dot {
-            background-color: var(--color-danger);
-            animation: rec-pulse 1.2s infinite ease-in-out;
-        }
-        @keyframes rec-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
-        }
-        #obsBadge {
-            font-size: 0.75rem;
-            font-family: var(--font-body);
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            color: var(--color-text-muted);
-        }
-    </style>
-</head>
-<body class="antialiased">
-    <div class="container mx-auto p-4">
-        <div class="bg-surface border rounded-2xl shadow-lg p-8">
-            <div class="flex items-center justify-between mb-8">
-                <div class="text-center" style="flex-grow: 1;">
-                    <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Vehicle Mod Tracker</h1>
-                    <p class="mt-2 text-sm" style="color: var(--color-text-muted);">Log builds, mods, and HP gains.</p>
-                </div>
-                <div id="statusBadge">Connecting...</div>
-            </div>
-
-            <div class="space-y-6">
-
-                <!-- OBS Recording Controls -->
-                <div class="rec-panel space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-semibold uppercase" style="color: var(--color-text-muted);">Recording Controls</h2>
-                        <div id="obsBadge">OBS: Idle</div>
-                    </div>
-
-                    <div class="rec-btn-row">
-                        <button type="button" id="loadingRecBtn" class="rec-btn">
-                            <span class="rec-dot"></span> Start Loading Recording
-                        </button>
-                        <button type="button" id="dynoRecBtn" class="rec-btn">
-                            <span class="rec-dot"></span> Start Dyno Pull Recording
-                        </button>
-                    </div>
-
-                    <div class="mt-2">
-                        <label class="text-xs" style="color: var(--color-text-muted);">Bridge Server URL</label>
-                        <input type="text" id="bridgeUrl" class="form-element w-full px-2 py-2 mt-1" placeholder="http://192.168.0.XX:5005">
-                        <p class="text-xs mt-1" style="color: var(--color-text-muted);">
-                            Auto-filled. Edit it only if the badge above says "Unreachable".
-                        </p>
-                    </div>
-                </div>
-
-                <form id="modForm" class="space-y-4">
-                    <!-- Adjusted Grid to fit 4 elements seamlessly on tablet/desktop -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
-                        <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
-                        <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
-                        <!-- New Trim Input added here -->
-                        <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-4 py-3">
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
-                        <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
-                    </div>
-                    <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-4 py-3"></textarea>
-
-                    <!-- Expandable Customer & Extra Info Section -->
-                    <details class="border rounded-lg" style="border-color: var(--color-border);">
-                        <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted);">
-                            + Add Customer Data & Post-Tune Info (Optional)
-                        </summary>
-                        <div class="p-4 space-y-4" style="border-top: 1px solid var(--color-border); background-color: #0A0A0A; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-4 py-3">
-                                <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-4 py-3">
-                            </div>
-                            <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-4 py-3"></textarea>
-                            <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-4 py-3"></textarea>
-                        </div>
-                    </details>
-
-                    <button type="submit" id="addBtn" disabled class="btn btn-primary w-full justify-center">Add to List</button>
-                </form>
-
-                <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-                <div id="emptyState" class="hidden">No mods logged yet. Add one above.</div>
-            </div>
-
-            <div id="statusMessage" class="text-center text-sm mt-4" style="height:1rem;"></div>
-        </div>
-    </div>
-
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { initializeFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeFirestore, doc, setDoc, getDocs, collection, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
@@ -364,134 +24,67 @@
         let db;
         let statusTimeout;
 
-        // ---------------- OBS RECORDING CONTROLS ----------------
-        // This talks to a small Python "bridge" server (obs_bridge_server.py)
-        // running on the SAME PC as OBS. That bridge does the actual OBS
-        // websocket talking over localhost; this page just calls it over
-        // plain HTTP across the LAN. See obs_bridge_server.py for setup.
-        
-        // Auto-detect the server hosting this page
-        const BRIDGE_CANDIDATES = [
-            window.location.origin
-        ];
-
+        // ---------------- FIREBASE OBS CONTROLS ----------------
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
-        const bridgeUrlInput = document.getElementById('bridgeUrl');
-        bridgeUrlInput.value = BRIDGE_CANDIDATES[0];
-
-        let activeRecordingLabel = null; // 'loading' | 'dyno' | null
+        let activeRecordingState = 'idle';
 
         function setObsBadge(msg, color) {
-            obsBadge.textContent = 'Bridge: ' + msg;
+            obsBadge.textContent = 'OBS: ' + msg;
             obsBadge.style.color = color || 'var(--color-text-muted)';
             obsBadge.style.borderColor = color || 'var(--color-border)';
         }
 
-        function bridgeBaseUrl() {
-            return bridgeUrlInput.value.trim().replace(/\/+$/, '');
-        }
-
-        async function callBridge(path, method) {
-            const base = bridgeBaseUrl();
-            if (!base) throw new Error('Set the Bridge Server URL first (see settings below the buttons).');
-            const res = await fetch(base + path, { method: method || 'POST' });
-            let body = {};
-            try { body = await res.json(); } catch (_) { /* ignore parse errors */ }
-            if (!res.ok || body.ok === false) {
-                throw new Error(body.error || `Bridge returned ${res.status}`);
-            }
-            return body;
-        }
-
-        async function checkBridgeStatus() {
-            try {
-                const body = await callBridge('/status', 'GET');
-                setObsBadge('Connected', '#22c55e');
-                return body;
-            } catch (err) {
-                setObsBadge('Unreachable', '#ef4444');
-                return null;
+        function setButtonRecordingState(state) {
+            if (state === 'recording_loading') {
+                loadingRecBtn.classList.add('is-recording');
+                loadingRecBtn.lastChild.textContent = ' Stop Loading Recording';
+                dynoRecBtn.disabled = true;
+            } else if (state === 'recording_dyno') {
+                dynoRecBtn.classList.add('is-recording');
+                dynoRecBtn.lastChild.textContent = ' Stop Dyno Pull Recording';
+                loadingRecBtn.disabled = true;
+            } else {
+                loadingRecBtn.classList.remove('is-recording');
+                loadingRecBtn.lastChild.textContent = ' Start Loading Recording';
+                loadingRecBtn.disabled = false;
+                
+                dynoRecBtn.classList.remove('is-recording');
+                dynoRecBtn.lastChild.textContent = ' Start Dyno Pull Recording';
+                dynoRecBtn.disabled = false;
             }
         }
 
-        function setButtonRecordingState(button, otherButton, label, recording) {
-            button.classList.toggle('is-recording', recording);
-            button.lastChild.textContent = (recording ? ' Stop ' : ' Start ') +
-                (label === 'loading' ? 'Loading' : 'Dyno Pull') + ' Recording';
-            otherButton.disabled = recording;
-        }
-
-        async function startRecording(endpoint, label, button, otherButton) {
+        async function sendObsCommand(actionStr) {
             try {
-                await callBridge(endpoint);
-                activeRecordingLabel = label;
-                setButtonRecordingState(button, otherButton, label, true);
-                setObsBadge('Recording ' + label, '#ef4444');
-                flashMessage(`Recording ${label}...`, false);
+                // Write the command to Firebase. The Python script is listening to this document.
+                await setDoc(doc(db, "obs_control", "command"), {
+                    action: actionStr,
+                    req_id: Date.now()
+                });
             } catch (err) {
-                console.error(err);
-                setObsBadge('Error', '#ef4444');
-                flashMessage('Start failed: ' + err.message, true);
-            }
-        }
-
-        async function stopRecording(label, button, otherButton) {
-            try {
-                const body = await callBridge('/stop');
-                activeRecordingLabel = null;
-                setButtonRecordingState(button, otherButton, label, false);
-                setObsBadge('Connected', '#22c55e');
-                flashMessage('Saved: ' + (body.outputPath || '(check OBS for file path)'), false);
-            } catch (err) {
-                console.error(err);
-                flashMessage('Stop failed: ' + err.message, true);
+                console.error("Error sending command:", err);
+                flashMessage('Failed to send command to OBS', true);
             }
         }
 
         loadingRecBtn.addEventListener('click', () => {
-            if (activeRecordingLabel === 'loading') {
-                stopRecording('loading', loadingRecBtn, dynoRecBtn);
+            if (activeRecordingState === 'recording_loading') {
+                sendObsCommand('stop');
             } else {
-                startRecording('/start/loading', 'loading', loadingRecBtn, dynoRecBtn);
+                sendObsCommand('start_loading');
             }
         });
+
         dynoRecBtn.addEventListener('click', () => {
-            if (activeRecordingLabel === 'dyno') {
-                stopRecording('dyno', dynoRecBtn, loadingRecBtn);
+            if (activeRecordingState === 'recording_dyno') {
+                sendObsCommand('stop');
             } else {
-                startRecording('/start/dyno', 'dyno', dynoRecBtn, loadingRecBtn);
+                sendObsCommand('start_dyno');
             }
         });
-
-        async function pingCandidate(url) {
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 1500);
-                const res = await fetch(url + '/status', { signal: controller.signal });
-                clearTimeout(timeout);
-                return res.ok;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        async function autoDiscoverBridge() {
-            setObsBadge('Searching...', '#a1a1aa');
-            for (const candidate of BRIDGE_CANDIDATES) {
-                if (await pingCandidate(candidate)) {
-                    bridgeUrlInput.value = candidate;
-                    setObsBadge('Connected', '#22c55e');
-                    return;
-                }
-            }
-            setObsBadge('Unreachable', '#ef4444');
-        }
-
-        bridgeUrlInput.addEventListener('change', checkBridgeStatus);
-        autoDiscoverBridge();
-        // ---------------- END OBS RECORDING CONTROLS ----------------
+        // ---------------- END FIREBASE OBS CONTROLS ----------------
 
         function setBadge(msg, color) {
             statusBadge.textContent = msg;
@@ -506,6 +99,7 @@
             statusTimeout = setTimeout(() => { statusMessage.textContent = ''; }, 3000);
         }
 
+        // Rest of your Mod Tracker rendering logic remains untouched below
         function escapeHtml(str) {
             const div = document.createElement('div');
             div.textContent = str ?? '';
@@ -516,13 +110,12 @@
             return escapeHtml(str).replace(/"/g, '&quot;');
         }
 
-        // Updated buildTitle to include trim alongside year, make, and model
         function buildTitle(data) {
             const parts = [
                 data.year || data.vehicleYear, 
                 data.make || data.vehicleMake, 
                 data.model || data.vehicleModel,
-                data.trim || data.vehicleTrim // Adds trim onto the end
+                data.trim || data.vehicleTrim 
             ].filter(Boolean);
             return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
         }
@@ -588,7 +181,6 @@
         function renderEditCard(card, id, data) {
             card.innerHTML = `
                 <div class="edit-fields space-y-2">
-                    <!-- Adjusted Edit Fields to include Trim layout -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                         <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || data.vehicleYear || '')}">
                         <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || data.vehicleMake || '')}">
@@ -623,14 +215,14 @@
                 year: card.querySelector('.edit-year').value.trim(),
                 make: card.querySelector('.edit-make').value.trim(),
                 model: card.querySelector('.edit-model').value.trim(),
-                trim: card.querySelector('.edit-trim').value.trim(), // Saving trim from edit view
+                trim: card.querySelector('.edit-trim').value.trim(), 
                 startHp: card.querySelector('.edit-startHp').value,
                 endHp: card.querySelector('.edit-endHp').value,
                 mods: card.querySelector('.edit-mods').value,
                 customerName: card.querySelector('.edit-custName').value.trim(),
                 customerInstagram: card.querySelector('.edit-custIg').value.trim(),
                 futureGoals: card.querySelector('.edit-future').value.trim(),
-                postTuneComments: card.querySelector('.edit-postTune').value.trim(),
+                postTuneComments: document.querySelector('.edit-postTune').value.trim(),
                 createdAt: originalData.createdAt || Date.now()
             };
 
@@ -680,7 +272,7 @@
             const year = document.getElementById('year').value.trim();
             const make = document.getElementById('make').value.trim();
             const model = document.getElementById('model').value.trim();
-            const trim = document.getElementById('trim').value.trim(); // Capture trim
+            const trim = document.getElementById('trim').value.trim(); 
 
             if (!make || !model) return;
 
@@ -688,7 +280,7 @@
                 year,
                 make,
                 model,
-                trim, // Save trim into Firebase
+                trim, 
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
@@ -705,7 +297,6 @@
                 await setDoc(docRef, newEntry);
                 modForm.reset();
                 
-                // Collapse details panel if open
                 const detailsPanel = modForm.querySelector('details');
                 if (detailsPanel) detailsPanel.open = false;
 
@@ -726,6 +317,29 @@
                 db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
                 addBtn.disabled = false;
                 loadMods();
+
+                // Start listening to the Python script's status in Firebase
+                const statusRef = doc(db, "obs_control", "status");
+                onSnapshot(statusRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        activeRecordingState = data.state || 'idle';
+                        
+                        setButtonRecordingState(activeRecordingState);
+
+                        if (activeRecordingState === 'recording_loading') {
+                            setObsBadge('Recording Loading...', '#ef4444');
+                        } else if (activeRecordingState === 'recording_dyno') {
+                            setObsBadge('Recording Dyno...', '#ef4444');
+                        } else if (activeRecordingState === 'error') {
+                            setObsBadge('Error', '#ef4444');
+                            flashMessage('OBS Error: ' + (data.message || 'Unknown'), true);
+                        } else {
+                            setObsBadge('Ready', '#22c55e');
+                        }
+                    }
+                });
+
             } catch (err) {
                 console.error(err);
                 setBadge('Init failed', '#ef4444');
@@ -733,5 +347,3 @@
             }
         })();
     </script>
-</body>
-</html>
