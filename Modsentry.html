@@ -292,7 +292,7 @@
                         <label class="text-xs" style="color: var(--color-text-muted);">Bridge Server URL</label>
                         <input type="text" id="bridgeUrl" class="form-element w-full px-2 py-2 mt-1" placeholder="http://192.168.0.XX:5005">
                         <p class="text-xs mt-1" style="color: var(--color-text-muted);">
-                            Auto-filled with your OBS PC's address. Edit it if the badge above says "Unreachable".
+                            Auto-filled. Edit it only if the badge above says "Unreachable".
                         </p>
                     </div>
                 </div>
@@ -369,9 +369,10 @@
         // running on the SAME PC as OBS. That bridge does the actual OBS
         // websocket talking over localhost; this page just calls it over
         // plain HTTP across the LAN. See obs_bridge_server.py for setup.
-        // Confirmed: the OBS PC's Metro network address.
+        
+        // Auto-detect the server hosting this page
         const BRIDGE_CANDIDATES = [
-            'http://192.168.1.123:5005'
+            window.location.origin
         ];
 
         const obsBadge = document.getElementById('obsBadge');
