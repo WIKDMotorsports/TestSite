@@ -2,26 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Dyno Control</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --color-background: #0A0A0A;
+            --color-background: #000000;
             --color-text: #EAEAEA;
             --color-text-muted: #a1a1aa;
             --color-primary: #FF3B30;
-            --color-success: #22c55e;
-            --color-surface: #141414;
-            --color-border: #2A2A2A;
-            --color-danger: #ef4444;
+            --color-primary-active: #D32F24;
+            --color-success: #34C759;
+            --color-surface: #111111;
+            --color-surface-hover: #1C1C1E;
+            --color-border: #2C2C2E;
+            --color-danger: #FF453A;
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
-        html { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            background-color: var(--color-background);
+        }
+        
         *, *:before, *:after { box-sizing: inherit; }
+        
         body {
             font-family: var(--font-body);
             background-color: var(--color-background);
@@ -29,53 +42,49 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             margin: 0;
+            /* Safe area padding for modern phones with notches */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 0.75rem; padding-right: 0.75rem; max-width: 56rem; }
-        @media (min-width: 640px) { .container { padding-left: 1rem; padding-right: 1rem; } }
-        
+
+        .container { 
+            width: 100%; 
+            margin: 0 auto; 
+            padding: 0.75rem; 
+            max-width: 56rem; 
+            flex: 1;
+        }
+        @media (min-width: 640px) { .container { padding: 1.5rem; } }
+
+        /* General Utilities */
         .p-4 { padding: 1rem; }
-        .p-8 { padding: 2rem; }
-        @media (max-width: 640px) {
-            .mobile-p-4 { padding: 1rem !important; }
-            .mobile-p-6 { padding: 1.25rem !important; }
-        }
-        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
         .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-4 { margin-top: 1rem; }
         .mt-6 { margin-top: 1.5rem; }
-        .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
-        .mb-3 { margin-bottom: 0.75rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .pt-4 { padding-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        
         .bg-surface { background-color: var(--color-surface); }
-        .bg-background { background-color: var(--color-background); }
         .border { border-width: 1px; border-style: solid; border-color: var(--color-border); }
         .border-t { border-top-width: 1px; border-top-style: solid; border-top-color: var(--color-border); }
-        .rounded-lg { border-radius: 0.5rem; }
         .rounded-xl { border-radius: 0.75rem; }
         .rounded-2xl { border-radius: 1rem; }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .shadow-lg { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+        
         .text-center { text-align: center; }
-        .text-white { color: #fff; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
         .text-xs { font-size: 0.75rem; line-height: 1rem; }
         .font-bold { font-weight: 700; }
         .font-semibold { font-weight: 600; }
         .uppercase { text-transform: uppercase; }
         .tracking-wider { letter-spacing: 0.05em; }
+        
         .hidden { display: none !important; }
-        .grid { display: grid; }
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .gap-2 { gap: 0.5rem; }
-        .gap-3 { gap: 0.75rem; }
-        .gap-4 { gap: 1rem; }
         .flex { display: flex; }
         .flex-col { display: flex; flex-direction: column; }
         .items-center { align-items: center; }
@@ -83,92 +92,172 @@
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
         .w-full { width: 100%; }
-        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        
+        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+        
+        /* Text Truncation Fixes */
+        .min-w-0 { min-width: 0; }
         .overflow-hidden { overflow: hidden; }
         .whitespace-nowrap { white-space: nowrap; }
         .text-ellipsis { text-overflow: ellipsis; }
+        
         .cursor-pointer { cursor: pointer; }
+        
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
 
         @media (min-width: 640px) {
             .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .sm\:inline-block { display: inline-block; }
         }
         @media (min-width: 768px) { 
-            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } 
             .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
-        @media (min-width: 1024px) {
-            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        }
 
-        /* --- Transitions & Custom Utilities --- */
+        /* --- Transitions & Animations --- */
         .transition-colors { transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
         .transition-transform { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-180 { transform: rotate(180deg); }
         
-        .thin-bar:hover { background-color: #1a1a1a !important; }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
-
         .form-element {
-            background-color: var(--color-surface);
+            background-color: #000000;
             border: 1px solid var(--color-border);
             color: var(--color-text);
-            border-radius: 8px;
+            border-radius: 0.5rem;
             transition: all 0.2s ease-in-out;
             font-family: var(--font-body);
-            font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
+            /* CRITICAL: 16px prevents iOS auto-zoom on focus */
+            font-size: 16px !important; 
+            appearance: none;
+            -webkit-appearance: none;
         }
         .form-element:focus {
             outline: none;
-            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
             border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px var(--color-primary);
         }
-        .form-element::placeholder { color: var(--color-text-muted); }
+        .form-element::placeholder { color: #666; }
 
         .btn {
             font-family: var(--font-heading);
-            font-weight: 600;
-            font-size: 18px;
+            font-weight: 700;
+            font-size: 1.125rem;
             text-transform: uppercase;
-            border-radius: 8px;
-            padding: 14px 24px; /* Slightly taller for mobile touch targets */
-            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            transition: all 0.15s ease;
             cursor: pointer;
-            border: 1px solid transparent;
-            min-height: 48px; /* Standard touch target height */
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .btn:active:not(:disabled) {
+            transform: scale(0.96);
         }
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
         .btn-primary {
             background-color: var(--color-primary);
             color: white;
-            border-color: var(--color-primary);
         }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #E03024;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        .btn-primary:active:not(:disabled) {
+            background-color: var(--color-primary-active);
         }
 
+        .rec-panel {
+            border: 1px solid var(--color-border); 
+            border-radius: 1rem;
+            padding: 1.25rem; 
+            background-color: var(--color-surface);
+        }
+        .rec-btn-row { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.75rem; 
+        }
+        @media (min-width: 640px) {
+            .rec-btn-row { flex-direction: row; }
+        }
+        .rec-btn {
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.75rem;
+            font-family: var(--font-heading); 
+            font-weight: 700; 
+            font-size: 1.125rem; 
+            text-transform: uppercase;
+            border-radius: 0.75rem; 
+            padding: 1.25rem 1rem; 
+            cursor: pointer; 
+            border: 2px solid var(--color-border);
+            background-color: #000000; 
+            color: var(--color-text); 
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .rec-btn:active:not(:disabled) {
+            transform: scale(0.96);
+            background-color: var(--color-surface-hover);
+        }
+        .rec-btn:disabled { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+        }
+        .rec-btn.is-recording { 
+            background-color: rgba(255, 69, 58, 0.15); 
+            border-color: var(--color-danger); 
+            color: #fff; 
+        }
+        .rec-dot { 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%; 
+            background-color: var(--color-border); 
+            flex-shrink: 0; 
+            transition: all 0.3s ease;
+        }
+        .rec-btn.is-recording .rec-dot { 
+            background-color: var(--color-danger); 
+            animation: rec-pulse 1.2s infinite ease-in-out; 
+            box-shadow: 0 0 10px var(--color-danger);
+        }
+        @keyframes rec-pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.4; } 
+        }
+        
+        .status-stack { display: flex; align-items: center; gap: 0.75rem; justify-content: flex-end; }
+        #statusBadge, #obsBadge {
+            font-size: 0.75rem; font-family: var(--font-body); font-weight: 700;
+            color: var(--color-text-muted); transition: color 0.2s ease;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        
+        .thin-bar {
+            background-color: var(--color-surface);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .thin-bar:active { background-color: var(--color-surface-hover); }
+
         .mod-card {
-            background-color: #0A0A0A;
+            background-color: #000000;
             border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            padding: 1rem;
         }
         .mod-card h3 {
             margin: 0 0 0.25rem 0;
@@ -180,7 +269,7 @@
         .mod-card .hp-line {
             font-size: 0.875rem;
             color: var(--color-success);
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
         .mod-card .mods-text {
@@ -194,96 +283,73 @@
             display: flex;
             justify-content: space-between;
             gap: 0.75rem;
-            margin-top: 0.75rem;
+            margin-top: 1rem;
             padding-top: 0.75rem;
             border-top: 1px solid var(--color-border);
         }
         .card-btn {
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
             cursor: pointer;
             font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            padding: 0.5rem 0.75rem; /* Larger touch target for mobile cards */
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            min-height: 36px;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.1s ease;
+            flex: 1;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
-        .card-btn:hover { color: var(--color-text); background-color: rgba(255,255,255,0.06); }
-        .delete-btn:hover { color: var(--color-danger); background-color: rgba(239, 68, 68, 0.1); }
-        .save-btn:hover { color: var(--color-success); background-color: rgba(34, 197, 94, 0.1); }
-        .edit-fields input, .edit-fields textarea { font-size: 16px; }
-
+        .card-btn:active { transform: scale(0.95); }
+        .delete-btn { color: var(--color-danger); border-color: rgba(255, 69, 58, 0.3); }
+        .save-btn { color: var(--color-success); border-color: rgba(52, 199, 89, 0.3); }
+        
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
-
-        .status-stack { display: flex; flex-direction: row; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
-        #statusBadge, #obsBadge {
-            font-size: 0.75rem; font-family: var(--font-body); font-weight: 600;
-            color: var(--color-text-muted); transition: color 0.2s ease;
-        }
-
-        .rec-panel {
-            border: 1px solid var(--color-border); border-radius: 0.75rem;
-            padding: 1rem 1.25rem; background-color: #0A0A0A;
-        }
-        .rec-btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        .rec-btn {
-            flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            font-family: var(--font-heading); font-weight: 700; font-size: 16px; text-transform: uppercase;
-            border-radius: 8px; padding: 14px 16px; cursor: pointer; border: 1px solid var(--color-border);
-            background-color: var(--color-surface); color: var(--color-text); transition: all 0.2s ease;
-            min-height: 50px;
-        }
-        .rec-btn:hover:not(:disabled) { border-color: var(--color-primary); }
-        .rec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .rec-btn.is-recording { background-color: rgba(239, 68, 68, 0.15); border-color: var(--color-danger); color: #fff; }
-        .rec-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--color-text-muted); flex-shrink: 0; }
-        .rec-btn.is-recording .rec-dot { background-color: var(--color-danger); animation: rec-pulse 1.2s infinite ease-in-out; }
-        @keyframes rec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-        .obs-offline-msg { font-size: 0.75rem; color: var(--color-text-muted); text-align: center; }
     </style>
 </head>
 <body class="antialiased">
-    <div class="container mx-auto p-2 sm:p-4">
-        <div class="bg-surface border rounded-2xl shadow-lg mobile-p-4 p-8">
+    <div class="container">
+        <div class="bg-surface border rounded-2xl shadow-lg p-3 sm:p-6" style="padding-bottom: 2rem;">
             <div class="space-y-6">
 
                 <!-- OBS Recording Controls -->
                 <div class="rec-panel space-y-4">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                        <h2 class="text-sm font-semibold uppercase" style="color: var(--color-text-muted);">Recording Controls</h2>
+                    <div class="flex flex-row items-center justify-between gap-2">
+                        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: var(--color-text-muted);">Recording</h2>
                         <div class="status-stack">
-                            <div id="statusBadge">Connecting...</div>
                             <div id="obsBadge">OBS: Idle</div>
+                            <div id="statusBadge">Connecting...</div>
                         </div>
                     </div>
 
                     <div class="rec-btn-row">
                         <button type="button" id="loadingRecBtn" class="rec-btn" disabled>
-                            <span class="rec-dot"></span> Start Loading Recording
+                            <span class="rec-dot"></span> <span id="loadBtnText">Loading Rec</span>
                         </button>
                         <button type="button" id="dynoRecBtn" class="rec-btn" disabled>
-                            <span class="rec-dot"></span> Start Dyno Pull Recording
+                            <span class="rec-dot"></span> <span id="dynoBtnText">Dyno Pull Rec</span>
                         </button>
                     </div>
-                    <div id="obsOfflineMsg" class="obs-offline-msg">Boot up the recording PC to enable controls.</div>
+                    <div id="obsOfflineMsg" class="text-xs text-center mt-2" style="color: var(--color-text-muted); display: none;">
+                        Boot up the recording PC to enable controls.
+                    </div>
                 </div>
 
-                <!-- Collapsible Section: Vehicles & Entry Form -->
-                <div class="mt-6 border border-border rounded-xl overflow-hidden" style="background-color: var(--color-surface);">
+                <div class="mt-6 border border-border rounded-xl overflow-hidden bg-surface">
                     
                     <!-- Thin Bar (Summary showing latest car) -->
-                    <div id="toggleMainSectionBtn" class="thin-bar p-4 flex items-center justify-between cursor-pointer transition-colors w-full">
-                        <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                    <div id="toggleMainSectionBtn" class="thin-bar p-4 flex items-center justify-between cursor-pointer w-full">
+                        <div class="flex items-center gap-3 overflow-hidden min-w-0">
                             <span class="text-xs font-bold uppercase py-1 px-2 rounded flex-shrink-0" style="background: rgba(255, 59, 48, 0.15); color: var(--color-primary);">Latest</span>
-                            <span id="latestCarText" class="font-semibold text-sm sm:text-base whitespace-nowrap text-ellipsis overflow-hidden" style="color: var(--color-text);">Loading Data...</span>
-                            <span id="latestCarHp" class="text-xs sm:text-sm font-semibold text-success hidden sm:inline-block"></span>
+                            <span id="latestCarText" class="font-semibold text-sm sm:text-base whitespace-nowrap text-ellipsis overflow-hidden min-w-0" style="color: var(--color-text);">Loading...</span>
+                            <span id="latestCarHp" class="text-xs sm:text-sm font-bold flex-shrink-0 hidden sm:inline-block" style="color: var(--color-success);"></span>
                         </div>
-                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style="color: var(--color-text-muted);">
-                            <span id="expandIndicatorText" class="text-xs font-semibold uppercase">Expand</span>
+                        <div class="flex items-center gap-2 flex-shrink-0" style="color: var(--color-text-muted);">
                             <svg id="expandIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="transition-transform" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                             </svg>
@@ -293,60 +359,62 @@
                     <!-- Expanded Content (List then Form) -->
                     <div id="mainExpandedContent" class="hidden flex-col">
                         
-                        <!-- Previous Vehicles List (Intermediately Expanded) -->
-                        <div class="p-3 sm:p-4 border-t border-border bg-background">
-                            <h3 class="text-xs font-bold uppercase mb-3 text-muted tracking-wider" style="color: var(--color-text-muted);">Previous Vehicles (<span id="totalVehiclesCount">0</span>)</h3>
-                            <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 custom-scrollbar" style="max-height: 380px; overflow-y: auto; padding-right: 2px;">
+                        <!-- Previous Vehicles List -->
+                        <div class="p-4 border-t border-border" style="background-color: #000000;">
+                            <h3 class="text-xs font-bold uppercase mb-3 tracking-wider" style="color: var(--color-text-muted);">History (<span id="totalVehiclesCount">0</span>)</h3>
+                            <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" style="max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px;">
                                 <!-- Mod Cards injected here -->
                             </div>
                         </div>
 
-                        <!-- Form Section (Always below the list) -->
-                        <div class="p-3 sm:p-4 border-t border-border bg-surface">
-                            <h3 class="text-xs font-bold uppercase mb-3 text-muted tracking-wider" style="color: var(--color-text-muted);">Add New Entry</h3>
-                            <form id="modForm" class="space-y-3 sm:space-y-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                                    <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
-                                    <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
-                                    <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
-                                    <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-4 py-3">
+                        <!-- Form Section -->
+                        <div class="p-4 border-t border-border bg-surface">
+                            <h3 class="text-xs font-bold uppercase mb-3 tracking-wider" style="color: var(--color-text-muted);">Add New Entry</h3>
+                            <form id="modForm" class="space-y-3">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <input type="number" id="year" placeholder="Year" class="form-element w-full px-3 py-3">
+                                    <input type="text" id="make" placeholder="Make" required class="form-element w-full px-3 py-3">
+                                    <input type="text" id="model" placeholder="Model" required class="form-element w-full px-3 py-3" style="grid-column: span 2;">
                                 </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                    <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
-                                    <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
+                                <div class="grid grid-cols-1 gap-3">
+                                    <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-3 py-3">
                                 </div>
-                                <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-4 py-3"></textarea>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-3 py-3">
+                                    <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-3 py-3">
+                                </div>
+                                <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-3 py-3"></textarea>
 
-                                <details class="border rounded-lg" style="border-color: var(--color-border);">
-                                    <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted);">
-                                        + Add Customer Data & Post-Tune Info (Optional)
+                                <details class="border rounded-lg overflow-hidden" style="border-color: var(--color-border);">
+                                    <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted); background-color: #000;">
+                                        + Extra Data (Customer / Post-Tune)
                                     </summary>
-                                    <div class="p-3 sm:p-4 space-y-3 sm:space-y-4" style="border-top: 1px solid var(--color-border); background-color: #0A0A0A; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                            <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-4 py-3">
-                                            <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-4 py-3">
+                                    <div class="p-3 space-y-3" style="border-top: 1px solid var(--color-border); background-color: var(--color-surface);">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-3 py-3">
+                                            <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-3 py-3">
                                         </div>
-                                        <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-4 py-3"></textarea>
-                                        <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                                        <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-3 py-3"></textarea>
+                                        <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-3 py-3"></textarea>
                                     </div>
                                 </details>
 
-                                <button type="submit" id="addBtn" disabled class="btn btn-primary w-full justify-center">Add to List</button>
+                                <button type="submit" id="addBtn" disabled class="btn btn-primary w-full mt-2">Add to List</button>
                             </form>
                         </div>
-
                     </div>
                 </div>
 
             </div>
-            <div id="statusMessage" class="text-center text-sm mt-4" style="height:1rem;"></div>
+            <div id="statusMessage" class="text-center font-bold text-sm mt-4" style="height:1.25rem;"></div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { initializeFirestore, doc, setDoc, getDocs, collection, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Maintained exact configuration as requested
         const firebaseConfig = {
             apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
             authDomain: "activity-log-7d4d6.firebaseapp.com",
@@ -359,20 +427,22 @@
 
         const COLLECTION_NAME = "vehicle_mods";
 
+        // Element References
         const statusBadge = document.getElementById('statusBadge');
         const statusMessage = document.getElementById('statusMessage');
         const addBtn = document.getElementById('addBtn');
         const modGrid = document.getElementById('modGrid');
         const modForm = document.getElementById('modForm');
-
-        let db;
-        let statusTimeout;
-
+        
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
+        const loadBtnText = document.getElementById('loadBtnText');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
+        const dynoBtnText = document.getElementById('dynoBtnText');
         const obsOfflineMsg = document.getElementById('obsOfflineMsg');
         
+        let db;
+        let statusTimeout;
         let activeRecordingState = 'idle';
         let obsConnected = false;
         let obsLastSeen = 0; 
@@ -385,20 +455,20 @@
         function setButtonRecordingState(state) {
             if (state === 'recording_loading') {
                 loadingRecBtn.classList.add('is-recording');
-                loadingRecBtn.lastChild.textContent = ' Stop Loading Recording';
+                loadBtnText.textContent = 'Stop Loading Rec';
                 dynoRecBtn.disabled = true;
             } else if (state === 'recording_dyno') {
                 dynoRecBtn.classList.add('is-recording');
-                dynoRecBtn.lastChild.textContent = ' Stop Dyno Pull Recording';
+                dynoBtnText.textContent = 'Stop Dyno Pull Rec';
                 loadingRecBtn.disabled = true;
             } else {
                 loadingRecBtn.classList.remove('is-recording');
-                loadingRecBtn.lastChild.textContent = ' Start Loading Recording';
-                loadingRecBtn.disabled = false;
+                loadBtnText.textContent = 'Start Loading Rec';
+                loadingRecBtn.disabled = !obsConnected;
                 
                 dynoRecBtn.classList.remove('is-recording');
-                dynoRecBtn.lastChild.textContent = ' Start Dyno Pull Recording';
-                dynoRecBtn.disabled = false;
+                dynoBtnText.textContent = 'Start Dyno Pull Rec';
+                dynoRecBtn.disabled = !obsConnected;
             }
             updateControlsAvailability();
         }
@@ -409,28 +479,37 @@
                 dynoRecBtn.disabled = true;
                 obsOfflineMsg.style.display = 'block';
             } else {
+                if(activeRecordingState === 'idle') {
+                    loadingRecBtn.disabled = false;
+                    dynoRecBtn.disabled = false;
+                }
                 obsOfflineMsg.style.display = 'none';
             }
         }
 
         async function sendObsCommand(actionStr) {
             try {
+                // Keep haptic feedback simulation snappy
+                if(navigator.vibrate) navigator.vibrate(50);
+                
                 await setDoc(doc(db, "obs_control", "command"), {
                     action: actionStr,
                     req_id: Date.now()
                 });
             } catch (err) {
                 console.error("Error sending command:", err);
-                flashMessage('Failed to send command to OBS', true);
+                flashMessage('Failed to send command', true);
             }
         }
 
-        loadingRecBtn.addEventListener('click', () => {
+        loadingRecBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             if (activeRecordingState === 'recording_loading') sendObsCommand('stop');
             else sendObsCommand('start_loading');
         });
 
-        dynoRecBtn.addEventListener('click', () => {
+        dynoRecBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             if (activeRecordingState === 'recording_dyno') sendObsCommand('stop');
             else sendObsCommand('start_dyno');
         });
@@ -438,7 +517,6 @@
         const toggleBtn = document.getElementById('toggleMainSectionBtn');
         const contentArea = document.getElementById('mainExpandedContent');
         const icon = document.getElementById('expandIcon');
-        const indicator = document.getElementById('expandIndicatorText');
         
         toggleBtn.addEventListener('click', () => {
             const isHidden = contentArea.classList.contains('hidden');
@@ -446,12 +524,10 @@
                 contentArea.classList.remove('hidden');
                 contentArea.classList.add('flex');
                 icon.classList.add('rotate-180');
-                indicator.textContent = 'Collapse';
             } else {
                 contentArea.classList.add('hidden');
                 contentArea.classList.remove('flex');
                 icon.classList.remove('rotate-180');
-                indicator.textContent = 'Expand';
             }
         });
 
@@ -493,7 +569,7 @@
             const countEl = document.getElementById('totalVehiclesCount');
 
             if (!entries || entries.length === 0) {
-                titleEl.textContent = "No vehicles logged yet. Click expand to add.";
+                titleEl.textContent = "No vehicles. Tap expand to add.";
                 hpEl.textContent = "";
                 hpEl.style.display = 'none';
                 countEl.textContent = "0";
@@ -517,7 +593,7 @@
             modGrid.innerHTML = '';
             
             if(entries.length === 0) {
-                modGrid.innerHTML = `<div class="text-sm text-center col-span-full py-4" style="color: var(--color-text-muted);">List is empty. Add a vehicle below.</div>`;
+                modGrid.innerHTML = `<div class="text-sm text-center col-span-full py-6" style="color: var(--color-text-muted);">List is empty. Add a vehicle below.</div>`;
                 return;
             }
 
@@ -563,44 +639,60 @@
                 <div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Mods:</strong><p class="mods-text">${escapeHtml(activeMods)}</p></div>
                 ${extraHtml}
                 <div class="card-footer">
-                    <button class="card-btn edit-btn">Edit</button>
-                    <button class="card-btn delete-btn">Delete</button>
+                    <button type="button" class="card-btn edit-btn">Edit</button>
+                    <button type="button" class="card-btn delete-btn">Delete</button>
                 </div>
             `;
-            card.querySelector('.edit-btn').addEventListener('click', () => renderEditCard(card, id, data));
-            card.querySelector('.delete-btn').addEventListener('click', () => deleteEntry(id));
+            
+            card.querySelector('.edit-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderEditCard(card, id, data);
+            });
+            card.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if(confirm("Delete this entry?")) deleteEntry(id);
+            });
         }
 
         function renderEditCard(card, id, data) {
             card.innerHTML = `
-                <div class="edit-fields space-y-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-                        <input type="number" class="form-element px-2 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || data.vehicleYear || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || data.vehicleMake || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || data.vehicleModel || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-trim" placeholder="Trim" value="${escapeAttr(data.trim || data.vehicleTrim || '')}">
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" class="form-element px-3 py-2 edit-year" placeholder="Year" value="${escapeAttr(data.year || data.vehicleYear || '')}">
+                        <input type="text" class="form-element px-3 py-2 edit-make" placeholder="Make" value="${escapeAttr(data.make || data.vehicleMake || '')}">
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input type="number" class="form-element px-2 py-2 edit-startHp" placeholder="Start HP" value="${escapeAttr(data.startHp || '')}">
-                        <input type="number" class="form-element px-2 py-2 edit-endHp" placeholder="End HP" value="${escapeAttr(data.endHp || '')}">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" class="form-element px-3 py-2 edit-model" placeholder="Model" value="${escapeAttr(data.model || data.vehicleModel || '')}">
+                        <input type="text" class="form-element px-3 py-2 edit-trim" placeholder="Trim" value="${escapeAttr(data.trim || data.vehicleTrim || '')}">
                     </div>
-                    <textarea class="form-element w-full px-2 py-2 edit-mods" rows="2" placeholder="Modifications">${escapeHtml(data.mods || data.priorMods || '')}</textarea>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" class="form-element px-3 py-2 edit-startHp" placeholder="Start HP" value="${escapeAttr(data.startHp || '')}">
+                        <input type="number" class="form-element px-3 py-2 edit-endHp" placeholder="End HP" value="${escapeAttr(data.endHp || '')}">
+                    </div>
+                    <textarea class="form-element w-full px-3 py-2 edit-mods" rows="2" placeholder="Modifications">${escapeHtml(data.mods || data.priorMods || '')}</textarea>
                     
-                    <div class="text-xs uppercase mt-2" style="color: var(--color-text-muted); font-weight: 600;">Customer & Extra Info</div>
+                    <div class="text-xs uppercase mt-2 font-bold" style="color: var(--color-text-muted);">Extra Info</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input type="text" class="form-element px-2 py-2 edit-custName" placeholder="Customer Name" value="${escapeAttr(data.customerName || '')}">
-                        <input type="text" class="form-element px-2 py-2 edit-custIg" placeholder="Instagram" value="${escapeAttr(data.customerInstagram || '')}">
+                        <input type="text" class="form-element px-3 py-2 edit-custName" placeholder="Customer Name" value="${escapeAttr(data.customerName || '')}">
+                        <input type="text" class="form-element px-3 py-2 edit-custIg" placeholder="Instagram" value="${escapeAttr(data.customerInstagram || '')}">
                     </div>
-                    <textarea class="form-element w-full px-2 py-2 edit-future" rows="2" placeholder="Future Goals">${escapeHtml(data.futureGoals || '')}</textarea>
-                    <textarea class="form-element w-full px-2 py-2 edit-postTune" rows="2" placeholder="Post-Tune Comments">${escapeHtml(data.postTuneComments || '')}</textarea>
+                    <textarea class="form-element w-full px-3 py-2 edit-future" rows="2" placeholder="Future Goals">${escapeHtml(data.futureGoals || '')}</textarea>
+                    <textarea class="form-element w-full px-3 py-2 edit-postTune" rows="2" placeholder="Post-Tune Comments">${escapeHtml(data.postTuneComments || '')}</textarea>
                 </div>
-                <div class="card-footer">
-                    <button class="card-btn cancel-btn">Cancel</button>
-                    <button class="card-btn save-btn">Save</button>
+                <div class="card-footer mt-4">
+                    <button type="button" class="card-btn cancel-btn" style="color: var(--color-text-muted);">Cancel</button>
+                    <button type="button" class="card-btn save-btn">Save</button>
                 </div>
             `;
-            card.querySelector('.cancel-btn').addEventListener('click', () => renderViewCard(card, id, data));
-            card.querySelector('.save-btn').addEventListener('click', () => handleSaveEdit(card, id, data));
+            
+            card.querySelector('.cancel-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderViewCard(card, id, data);
+            });
+            card.querySelector('.save-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                handleSaveEdit(card, id, data);
+            });
         }
 
         async function handleSaveEdit(card, id, originalData) {
@@ -620,7 +712,7 @@
             };
 
             if (!updated.make || !updated.model) {
-                flashMessage('Make and Model are required.', true);
+                flashMessage('Make & Model required', true);
                 return;
             }
 
@@ -630,7 +722,7 @@
                 flashMessage('Updated!', false);
             } catch (err) {
                 console.error(err);
-                flashMessage('Update failed: ' + err.message, true);
+                flashMessage('Update failed', true);
             }
         }
 
@@ -641,11 +733,11 @@
                 snapshot.forEach(d => entries.push({ id: d.id, data: d.data() }));
                 entries.sort((a, b) => (b.data.createdAt || 0) - (a.data.createdAt || 0));
                 renderMods(entries);
-                setBadge('Synced', '#22c55e');
+                setBadge('Synced', '#34C759');
             } catch (err) {
                 console.error(err);
-                setBadge('Load failed', '#ef4444');
-                flashMessage('Could not load mods: ' + err.message, true);
+                setBadge('Load failed', '#FF453A');
+                flashMessage('Could not load mods.', true);
             }
         }
 
@@ -656,7 +748,7 @@
                 flashMessage('Deleted.', false);
             } catch (err) {
                 console.error(err);
-                flashMessage('Delete failed: ' + err.message, true);
+                flashMessage('Delete failed.', true);
             }
         }
 
@@ -670,10 +762,7 @@
             if (!make || !model) return;
 
             const newEntry = {
-                year,
-                make,
-                model,
-                trim, 
+                year, make, model, trim, 
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
@@ -694,12 +783,12 @@
                 if (detailsPanel) detailsPanel.open = false;
 
                 await loadMods();
-                flashMessage('Added!', false);
+                flashMessage('Added Successfully!', false);
                 
-                modGrid.scrollTop = 0;
+                if(modGrid) modGrid.scrollTop = 0;
             } catch (err) {
                 console.error(err);
-                flashMessage('Save failed: ' + err.message, true);
+                flashMessage('Save failed', true);
             } finally {
                 addBtn.disabled = false;
             }
@@ -709,15 +798,17 @@
             try {
                 setBadge('Connecting...');
                 const app = initializeApp(firebaseConfig);
-                db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+                db = getFirestore(app);
+                
                 addBtn.disabled = false;
                 loadMods();
 
                 const statusRef = doc(db, "obs_control", "status");
+                
+                // Keep the live listener running to monitor OBS Status
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        
                         obsLastSeen = Date.now();
                         obsConnected = true;
                         
@@ -725,18 +816,21 @@
                         setButtonRecordingState(activeRecordingState);
 
                         if (activeRecordingState === 'recording_loading') {
-                            setObsBadge('Recording Loading...', '#ef4444');
+                            setObsBadge('Rec Loading...', '#FF453A');
                         } else if (activeRecordingState === 'recording_dyno') {
-                            setObsBadge('Recording Dyno...', '#ef4444');
+                            setObsBadge('Rec Dyno...', '#FF453A');
                         } else if (activeRecordingState === 'error') {
-                            setObsBadge('Error', '#ef4444');
+                            setObsBadge('Error', '#FF453A');
                             flashMessage('OBS Error: ' + (data.message || 'Unknown'), true);
                         } else {
-                            setObsBadge('Ready', '#22c55e');
+                            setObsBadge('Ready', '#34C759');
                         }
                     }
+                }, (error) => {
+                    console.error("Snapshot error:", error);
                 });
 
+                // Polling to mark offline if no heartbeat
                 setInterval(() => {
                     if (Date.now() - obsLastSeen > 15000) {
                         if (obsConnected) {
@@ -750,8 +844,8 @@
 
             } catch (err) {
                 console.error(err);
-                setBadge('Init failed', '#ef4444');
-                flashMessage('Firebase init failed: ' + err.message, true);
+                setBadge('Init failed', '#FF453A');
+                flashMessage('Failed to initialize app', true);
             }
         })();
     </script>
