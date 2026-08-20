@@ -187,7 +187,7 @@
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
 
-        /* --- Status indicators (stacked, text-color-only) --- */
+        /* --- Status indicators --- */
         .status-stack {
             display: flex;
             flex-direction: row;
@@ -348,9 +348,10 @@
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
         const obsOfflineMsg = document.getElementById('obsOfflineMsg');
+        
         let activeRecordingState = 'idle';
         let obsConnected = false;
-        let obsLastSeen = 0; // Tracks the last time we got a heartbeat from the recording PC
+        let obsLastSeen = 0; // We track local time of arrival, not server time!
 
         function setObsBadge(msg, color) {
             obsBadge.textContent = 'OBS: ' + msg;
@@ -641,29 +642,17 @@
                 addBtn.disabled = false;
                 loadMods();
 
-                // Start listening to the Python script's status in Firebase
+                // 1. LISTEN TO PYTHON HEARTBEAT
                 const statusRef = doc(db, "obs_control", "status");
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // Treat the document as stale immediately if it doesn't have a timestamp,
-                        // or if the timestamp it does have is already older than 15 seconds.
-                        const lastSeen = data.lastUpdated || 0;
-                        const isStale = (Date.now() - lastSeen) > 15000;
-
-                        if (isStale) {
-                            obsConnected = false;
-                            activeRecordingState = 'idle';
-                            setObsBadge('Idle');
-                            setButtonRecordingState(activeRecordingState);
-                            return; // Stop processing this payload, it's too old
-                        }
-                        
-                        obsLastSeen = lastSeen;
+                        // We physically stamp our own local time. We don't care what time Python thinks it is.
+                        obsLastSeen = Date.now();
                         obsConnected = true;
-                        activeRecordingState = data.state || 'idle';
                         
+                        activeRecordingState = data.state || 'idle';
                         setButtonRecordingState(activeRecordingState);
 
                         if (activeRecordingState === 'recording_loading') {
@@ -676,22 +665,19 @@
                         } else {
                             setObsBadge('Ready', '#22c55e');
                         }
-                    } else {
-                        obsConnected = false;
-                        activeRecordingState = 'idle';
-                        setObsBadge('Idle');
-                        setButtonRecordingState(activeRecordingState);
                     }
                 });
 
-                // --- HEARTBEAT CHECKER ---
-                // Every 3 seconds, check if the last snapshot from the PC is older than 15 seconds.
+                // 2. BACKGROUND STALENESS WATCHER (Runs every 3 seconds)
                 setInterval(() => {
-                    if (obsConnected && (Date.now() - obsLastSeen > 15000)) {
-                        obsConnected = false;
-                        activeRecordingState = 'idle';
-                        setObsBadge('Idle');
-                        setButtonRecordingState(activeRecordingState);
+                    // If it's been more than 15 seconds since the last Python ping, mark as dead.
+                    if (Date.now() - obsLastSeen > 15000) {
+                        if (obsConnected) { // Only update UI if we were previously connected to avoid flickering
+                            obsConnected = false;
+                            activeRecordingState = 'idle';
+                            setObsBadge('Offline', 'var(--color-text-muted)');
+                            setButtonRecordingState('idle'); 
+                        }
                     }
                 }, 3000);
 
