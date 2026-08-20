@@ -350,6 +350,7 @@
         const obsOfflineMsg = document.getElementById('obsOfflineMsg');
         let activeRecordingState = 'idle';
         let obsConnected = false;
+        let obsLastSeen = 0; // Tracks the last time we got a heartbeat from the recording PC
 
         function setObsBadge(msg, color) {
             obsBadge.textContent = 'OBS: ' + msg;
@@ -645,6 +646,9 @@
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+                        
+                        // Grab the timestamp from Python (or use Date.now() as a fallback upon receipt)
+                        obsLastSeen = data.lastUpdated || Date.now();
                         obsConnected = true;
                         activeRecordingState = data.state || 'idle';
                         
@@ -667,6 +671,18 @@
                         setButtonRecordingState(activeRecordingState);
                     }
                 });
+
+                // --- HEARTBEAT CHECKER ---
+                // Every 3 seconds, check if the last snapshot from the PC is older than 15 seconds.
+                setInterval(() => {
+                    if (obsConnected && (Date.now() - obsLastSeen > 15000)) {
+                        console.log("OBS status is stale. Marking as offline.");
+                        obsConnected = false;
+                        activeRecordingState = 'idle';
+                        setObsBadge('Idle');
+                        setButtonRecordingState(activeRecordingState);
+                    }
+                }, 3000);
 
             } catch (err) {
                 console.error(err);
