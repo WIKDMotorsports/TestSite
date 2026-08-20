@@ -20,7 +20,7 @@
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
-        html { box-sizing: border-box; }
+        html { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         *, *:before, *:after { box-sizing: inherit; }
         body {
             font-family: var(--font-body);
@@ -29,10 +29,17 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             margin: 0;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-        .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; max-width: 56rem; }
+        .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 0.75rem; padding-right: 0.75rem; max-width: 56rem; }
+        @media (min-width: 640px) { .container { padding-left: 1rem; padding-right: 1rem; } }
+        
         .p-4 { padding: 1rem; }
         .p-8 { padding: 2rem; }
+        @media (max-width: 640px) {
+            .mobile-p-4 { padding: 1rem !important; }
+            .mobile-p-6 { padding: 1.25rem !important; }
+        }
         .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
         .px-4 { padding-left: 1rem; padding-right: 1rem; }
         .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
@@ -41,11 +48,16 @@
         .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
         .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
         .mb-8 { margin-bottom: 2rem; }
+        .pt-4 { padding-top: 1rem; }
         .bg-surface { background-color: var(--color-surface); }
+        .bg-background { background-color: var(--color-background); }
         .border { border-width: 1px; border-style: solid; border-color: var(--color-border); }
+        .border-t { border-top-width: 1px; border-top-style: solid; border-top-color: var(--color-border); }
         .rounded-lg { border-radius: 0.5rem; }
         .rounded-xl { border-radius: 0.75rem; }
         .rounded-2xl { border-radius: 1rem; }
@@ -54,36 +66,55 @@
         .text-white { color: #fff; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
         .text-xs { font-size: 0.75rem; line-height: 1rem; }
-        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
         .font-bold { font-weight: 700; }
         .font-semibold { font-weight: 600; }
         .uppercase { text-transform: uppercase; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .hidden { display: none !important; }
         .grid { display: grid; }
         .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
         .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
         .gap-4 { gap: 1rem; }
         .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
-        .justify-end { justify-content: flex-end; }
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
         .w-full { width: 100%; }
         .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+        .overflow-hidden { overflow: hidden; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .text-ellipsis { text-overflow: ellipsis; }
+        .cursor-pointer { cursor: pointer; }
+
         @media (min-width: 640px) {
             .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .sm\:inline-block { display: inline-block; }
         }
         @media (min-width: 768px) { 
             .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } 
             .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
         @media (min-width: 1024px) {
+            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
+
+        /* --- Transitions & Custom Utilities --- */
+        .transition-colors { transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        .transition-transform { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .rotate-180 { transform: rotate(180deg); }
+        
+        .thin-bar:hover { background-color: #1a1a1a !important; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
         .form-element {
             background-color: var(--color-surface);
@@ -92,6 +123,7 @@
             border-radius: 8px;
             transition: all 0.2s ease-in-out;
             font-family: var(--font-body);
+            font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
         }
         .form-element:focus {
             outline: none;
@@ -106,10 +138,14 @@
             font-size: 18px;
             text-transform: uppercase;
             border-radius: 8px;
-            padding: 12px 24px;
+            padding: 14px 24px; /* Slightly taller for mobile touch targets */
             transition: all 0.3s ease;
             cursor: pointer;
             border: 1px solid transparent;
+            min-height: 48px; /* Standard touch target height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn:disabled {
             opacity: 0.5;
@@ -127,12 +163,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
         }
-        .btn-secondary {
-            background-color: var(--color-surface);
-            color: var(--color-primary);
-            border-color: var(--color-primary);
-        }
-        .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
 
         .mod-card {
             background-color: #0A0A0A;
@@ -158,11 +188,12 @@
             color: var(--color-text-muted);
             white-space: pre-line;
             margin: 0;
+            word-break: break-word;
         }
         .mod-card .card-footer {
             display: flex;
             justify-content: space-between;
-            gap: 0.5rem;
+            gap: 0.75rem;
             margin-top: 0.75rem;
             padding-top: 0.75rem;
             border-top: 1px solid var(--color-border);
@@ -172,97 +203,57 @@
             border: none;
             color: var(--color-text-muted);
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            padding: 0.25rem 0.5rem;
+            padding: 0.5rem 0.75rem; /* Larger touch target for mobile cards */
             border-radius: 4px;
             transition: all 0.2s ease;
+            min-height: 36px;
         }
         .card-btn:hover { color: var(--color-text); background-color: rgba(255,255,255,0.06); }
         .delete-btn:hover { color: var(--color-danger); background-color: rgba(239, 68, 68, 0.1); }
         .save-btn:hover { color: var(--color-success); background-color: rgba(34, 197, 94, 0.1); }
-        .edit-fields input, .edit-fields textarea { font-size: 0.875rem; }
+        .edit-fields input, .edit-fields textarea { font-size: 16px; }
 
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
 
-        /* --- Status indicators --- */
-        .status-stack {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 1rem;
-        }
+        .status-stack { display: flex; flex-direction: row; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
         #statusBadge, #obsBadge {
-            font-size: 0.75rem;
-            font-family: var(--font-body);
-            font-weight: 600;
-            color: var(--color-text-muted);
-            transition: color 0.2s ease;
+            font-size: 0.75rem; font-family: var(--font-body); font-weight: 600;
+            color: var(--color-text-muted); transition: color 0.2s ease;
         }
 
-        /* --- OBS Recording Controls --- */
         .rec-panel {
-            border: 1px solid var(--color-border);
-            border-radius: 0.75rem;
-            padding: 1rem 1.25rem;
-            background-color: #0A0A0A;
+            border: 1px solid var(--color-border); border-radius: 0.75rem;
+            padding: 1rem 1.25rem; background-color: #0A0A0A;
         }
         .rec-btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
         .rec-btn {
-            flex: 1 1 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            border-radius: 8px;
-            padding: 14px 16px;
-            cursor: pointer;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            color: var(--color-text);
-            transition: all 0.2s ease;
+            flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            font-family: var(--font-heading); font-weight: 700; font-size: 16px; text-transform: uppercase;
+            border-radius: 8px; padding: 14px 16px; cursor: pointer; border: 1px solid var(--color-border);
+            background-color: var(--color-surface); color: var(--color-text); transition: all 0.2s ease;
+            min-height: 50px;
         }
         .rec-btn:hover:not(:disabled) { border-color: var(--color-primary); }
         .rec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .rec-btn.is-recording {
-            background-color: rgba(239, 68, 68, 0.15);
-            border-color: var(--color-danger);
-            color: #fff;
-        }
-        .rec-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background-color: var(--color-text-muted);
-            flex-shrink: 0;
-        }
-        .rec-btn.is-recording .rec-dot {
-            background-color: var(--color-danger);
-            animation: rec-pulse 1.2s infinite ease-in-out;
-        }
-        @keyframes rec-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
-        }
-        .obs-offline-msg {
-            font-size: 0.75rem;
-            color: var(--color-text-muted);
-            text-align: center;
-        }
+        .rec-btn.is-recording { background-color: rgba(239, 68, 68, 0.15); border-color: var(--color-danger); color: #fff; }
+        .rec-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--color-text-muted); flex-shrink: 0; }
+        .rec-btn.is-recording .rec-dot { background-color: var(--color-danger); animation: rec-pulse 1.2s infinite ease-in-out; }
+        @keyframes rec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .obs-offline-msg { font-size: 0.75rem; color: var(--color-text-muted); text-align: center; }
     </style>
 </head>
 <body class="antialiased">
-    <div class="container mx-auto p-4">
-        <div class="bg-surface border rounded-2xl shadow-lg p-8">
+    <div class="container mx-auto p-2 sm:p-4">
+        <div class="bg-surface border rounded-2xl shadow-lg mobile-p-4 p-8">
             <div class="space-y-6">
 
                 <!-- OBS Recording Controls -->
                 <div class="rec-panel space-y-4">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <h2 class="text-sm font-semibold uppercase" style="color: var(--color-text-muted);">Recording Controls</h2>
                         <div class="status-stack">
                             <div id="statusBadge">Connecting...</div>
@@ -281,39 +272,73 @@
                     <div id="obsOfflineMsg" class="obs-offline-msg">Boot up the recording PC to enable controls.</div>
                 </div>
 
-                <form id="modForm" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
-                        <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
-                        <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
-                        <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-4 py-3">
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
-                        <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
-                    </div>
-                    <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-4 py-3"></textarea>
-
-                    <details class="border rounded-lg" style="border-color: var(--color-border);">
-                        <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted);">
-                            + Add Customer Data & Post-Tune Info (Optional)
-                        </summary>
-                        <div class="p-4 space-y-4" style="border-top: 1px solid var(--color-border); background-color: #0A0A0A; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-4 py-3">
-                                <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-4 py-3">
-                            </div>
-                            <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-4 py-3"></textarea>
-                            <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                <!-- Collapsible Section: Vehicles & Entry Form -->
+                <div class="mt-6 border border-border rounded-xl overflow-hidden" style="background-color: var(--color-surface);">
+                    
+                    <!-- Thin Bar (Summary showing latest car) -->
+                    <div id="toggleMainSectionBtn" class="thin-bar p-4 flex items-center justify-between cursor-pointer transition-colors w-full">
+                        <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                            <span class="text-xs font-bold uppercase py-1 px-2 rounded flex-shrink-0" style="background: rgba(255, 59, 48, 0.15); color: var(--color-primary);">Latest</span>
+                            <span id="latestCarText" class="font-semibold text-sm sm:text-base whitespace-nowrap text-ellipsis overflow-hidden" style="color: var(--color-text);">Loading Data...</span>
+                            <span id="latestCarHp" class="text-xs sm:text-sm font-semibold text-success hidden sm:inline-block"></span>
                         </div>
-                    </details>
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style="color: var(--color-text-muted);">
+                            <span id="expandIndicatorText" class="text-xs font-semibold uppercase">Expand</span>
+                            <svg id="expandIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="transition-transform" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </div>
+                    </div>
 
-                    <button type="submit" id="addBtn" disabled class="btn btn-primary w-full justify-center">Add to List</button>
-                </form>
+                    <!-- Expanded Content (List then Form) -->
+                    <div id="mainExpandedContent" class="hidden flex-col">
+                        
+                        <!-- Previous Vehicles List (Intermediately Expanded) -->
+                        <div class="p-3 sm:p-4 border-t border-border bg-background">
+                            <h3 class="text-xs font-bold uppercase mb-3 text-muted tracking-wider" style="color: var(--color-text-muted);">Previous Vehicles (<span id="totalVehiclesCount">0</span>)</h3>
+                            <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 custom-scrollbar" style="max-height: 380px; overflow-y: auto; padding-right: 2px;">
+                                <!-- Mod Cards injected here -->
+                            </div>
+                        </div>
 
-                <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+                        <!-- Form Section (Always below the list) -->
+                        <div class="p-3 sm:p-4 border-t border-border bg-surface">
+                            <h3 class="text-xs font-bold uppercase mb-3 text-muted tracking-wider" style="color: var(--color-text-muted);">Add New Entry</h3>
+                            <form id="modForm" class="space-y-3 sm:space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                                    <input type="number" id="year" placeholder="Year" class="form-element w-full px-4 py-3">
+                                    <input type="text" id="make" placeholder="Make" required class="form-element w-full px-4 py-3">
+                                    <input type="text" id="model" placeholder="Model" required class="form-element w-full px-4 py-3">
+                                    <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-4 py-3">
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                    <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-4 py-3">
+                                    <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-4 py-3">
+                                </div>
+                                <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-4 py-3"></textarea>
+
+                                <details class="border rounded-lg" style="border-color: var(--color-border);">
+                                    <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted);">
+                                        + Add Customer Data & Post-Tune Info (Optional)
+                                    </summary>
+                                    <div class="p-3 sm:p-4 space-y-3 sm:space-y-4" style="border-top: 1px solid var(--color-border); background-color: #0A0A0A; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                            <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-4 py-3">
+                                            <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-4 py-3">
+                                        </div>
+                                        <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                                        <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-4 py-3"></textarea>
+                                    </div>
+                                </details>
+
+                                <button type="submit" id="addBtn" disabled class="btn btn-primary w-full justify-center">Add to List</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
-
             <div id="statusMessage" class="text-center text-sm mt-4" style="height:1rem;"></div>
         </div>
     </div>
@@ -343,7 +368,6 @@
         let db;
         let statusTimeout;
 
-        // ---------------- FIREBASE OBS CONTROLS ----------------
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
@@ -351,7 +375,7 @@
         
         let activeRecordingState = 'idle';
         let obsConnected = false;
-        let obsLastSeen = 0; // We track local time of arrival, not server time!
+        let obsLastSeen = 0; 
 
         function setObsBadge(msg, color) {
             obsBadge.textContent = 'OBS: ' + msg;
@@ -402,21 +426,34 @@
         }
 
         loadingRecBtn.addEventListener('click', () => {
-            if (activeRecordingState === 'recording_loading') {
-                sendObsCommand('stop');
-            } else {
-                sendObsCommand('start_loading');
-            }
+            if (activeRecordingState === 'recording_loading') sendObsCommand('stop');
+            else sendObsCommand('start_loading');
         });
 
         dynoRecBtn.addEventListener('click', () => {
-            if (activeRecordingState === 'recording_dyno') {
-                sendObsCommand('stop');
+            if (activeRecordingState === 'recording_dyno') sendObsCommand('stop');
+            else sendObsCommand('start_dyno');
+        });
+
+        const toggleBtn = document.getElementById('toggleMainSectionBtn');
+        const contentArea = document.getElementById('mainExpandedContent');
+        const icon = document.getElementById('expandIcon');
+        const indicator = document.getElementById('expandIndicatorText');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = contentArea.classList.contains('hidden');
+            if (isHidden) {
+                contentArea.classList.remove('hidden');
+                contentArea.classList.add('flex');
+                icon.classList.add('rotate-180');
+                indicator.textContent = 'Collapse';
             } else {
-                sendObsCommand('start_dyno');
+                contentArea.classList.add('hidden');
+                contentArea.classList.remove('flex');
+                icon.classList.remove('rotate-180');
+                indicator.textContent = 'Expand';
             }
         });
-        // ---------------- END FIREBASE OBS CONTROLS ----------------
 
         function setBadge(msg, color) {
             statusBadge.textContent = msg;
@@ -450,8 +487,40 @@
             return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
         }
 
+        function updateThinBar(entries) {
+            const titleEl = document.getElementById('latestCarText');
+            const hpEl = document.getElementById('latestCarHp');
+            const countEl = document.getElementById('totalVehiclesCount');
+
+            if (!entries || entries.length === 0) {
+                titleEl.textContent = "No vehicles logged yet. Click expand to add.";
+                hpEl.textContent = "";
+                hpEl.style.display = 'none';
+                countEl.textContent = "0";
+            } else {
+                const latest = entries[0].data;
+                titleEl.textContent = buildTitle(latest) || "Unknown Vehicle";
+                
+                if (latest.startHp && latest.endHp) {
+                    hpEl.textContent = `${latest.startHp} ➔ ${latest.endHp} HP`;
+                    hpEl.style.display = 'inline-block';
+                } else {
+                    hpEl.textContent = "";
+                    hpEl.style.display = 'none';
+                }
+                countEl.textContent = entries.length;
+            }
+        }
+
         function renderMods(entries) {
+            updateThinBar(entries);
             modGrid.innerHTML = '';
+            
+            if(entries.length === 0) {
+                modGrid.innerHTML = `<div class="text-sm text-center col-span-full py-4" style="color: var(--color-text-muted);">List is empty. Add a vehicle below.</div>`;
+                return;
+            }
+
             entries.forEach(({ id, data }) => {
                 const card = document.createElement('div');
                 card.className = 'mod-card';
@@ -557,7 +626,7 @@
 
             try {
                 await setDoc(doc(db, COLLECTION_NAME, id), updated);
-                renderViewCard(card, id, updated);
+                await loadMods(); 
                 flashMessage('Updated!', false);
             } catch (err) {
                 console.error(err);
@@ -626,6 +695,8 @@
 
                 await loadMods();
                 flashMessage('Added!', false);
+                
+                modGrid.scrollTop = 0;
             } catch (err) {
                 console.error(err);
                 flashMessage('Save failed: ' + err.message, true);
@@ -642,13 +713,11 @@
                 addBtn.disabled = false;
                 loadMods();
 
-                // 1. LISTEN TO PYTHON HEARTBEAT
                 const statusRef = doc(db, "obs_control", "status");
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // We physically stamp our own local time. We don't care what time Python thinks it is.
                         obsLastSeen = Date.now();
                         obsConnected = true;
                         
@@ -668,11 +737,9 @@
                     }
                 });
 
-                // 2. BACKGROUND STALENESS WATCHER (Runs every 3 seconds)
                 setInterval(() => {
-                    // If it's been more than 15 seconds since the last Python ping, mark as dead.
                     if (Date.now() - obsLastSeen > 15000) {
-                        if (obsConnected) { // Only update UI if we were previously connected to avoid flickering
+                        if (obsConnected) {
                             obsConnected = false;
                             activeRecordingState = 'idle';
                             setObsBadge('Offline', 'var(--color-text-muted)');
