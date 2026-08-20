@@ -647,8 +647,20 @@
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // Grab the timestamp from Python (or use Date.now() as a fallback upon receipt)
-                        obsLastSeen = data.lastUpdated || Date.now();
+                        // Treat the document as stale immediately if it doesn't have a timestamp,
+                        // or if the timestamp it does have is already older than 15 seconds.
+                        const lastSeen = data.lastUpdated || 0;
+                        const isStale = (Date.now() - lastSeen) > 15000;
+
+                        if (isStale) {
+                            obsConnected = false;
+                            activeRecordingState = 'idle';
+                            setObsBadge('Idle');
+                            setButtonRecordingState(activeRecordingState);
+                            return; // Stop processing this payload, it's too old
+                        }
+                        
+                        obsLastSeen = lastSeen;
                         obsConnected = true;
                         activeRecordingState = data.state || 'idle';
                         
@@ -676,7 +688,6 @@
                 // Every 3 seconds, check if the last snapshot from the PC is older than 15 seconds.
                 setInterval(() => {
                     if (obsConnected && (Date.now() - obsLastSeen > 15000)) {
-                        console.log("OBS status is stale. Marking as offline.");
                         obsConnected = false;
                         activeRecordingState = 'idle';
                         setObsBadge('Idle');
