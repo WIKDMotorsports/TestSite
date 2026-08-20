@@ -66,6 +66,7 @@
         .flex { display: flex; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
         .w-full { width: 100%; }
@@ -186,20 +187,19 @@
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
 
-        #statusBadge {
+        /* --- Status indicators (stacked, text-color-only) --- */
+        .status-stack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+        }
+        #statusBadge, #obsBadge {
             font-size: 0.75rem;
             font-family: var(--font-body);
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
+            font-weight: 600;
             color: var(--color-text-muted);
-        }
-        #emptyState {
-            text-align: center;
-            color: var(--color-text-muted);
-            font-size: 0.875rem;
-            padding: 2rem 1rem;
+            transition: color 0.2s ease;
         }
 
         /* --- OBS Recording Controls --- */
@@ -248,44 +248,37 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.35; }
         }
-        #obsBadge {
+        .obs-offline-msg {
             font-size: 0.75rem;
-            font-family: var(--font-body);
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
             color: var(--color-text-muted);
+            text-align: center;
         }
     </style>
 </head>
 <body class="antialiased">
     <div class="container mx-auto p-4">
         <div class="bg-surface border rounded-2xl shadow-lg p-8">
-            <div class="flex items-center justify-between mb-8">
-                <div class="text-center" style="flex-grow: 1;">
-                    <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Dyno Control</h1>
-                </div>
-                <div id="statusBadge">Connecting...</div>
-            </div>
-
             <div class="space-y-6">
 
                 <!-- OBS Recording Controls -->
                 <div class="rec-panel space-y-4">
                     <div class="flex items-center justify-between">
                         <h2 class="text-sm font-semibold uppercase" style="color: var(--color-text-muted);">Recording Controls</h2>
-                        <div id="obsBadge">OBS: Idle</div>
+                        <div class="status-stack">
+                            <div id="statusBadge">Connecting...</div>
+                            <div id="obsBadge">OBS: Idle</div>
+                        </div>
                     </div>
 
                     <div class="rec-btn-row">
-                        <button type="button" id="loadingRecBtn" class="rec-btn">
+                        <button type="button" id="loadingRecBtn" class="rec-btn" disabled>
                             <span class="rec-dot"></span> Start Loading Recording
                         </button>
-                        <button type="button" id="dynoRecBtn" class="rec-btn">
+                        <button type="button" id="dynoRecBtn" class="rec-btn" disabled>
                             <span class="rec-dot"></span> Start Dyno Pull Recording
                         </button>
                     </div>
+                    <div id="obsOfflineMsg" class="obs-offline-msg">Boot up the recording PC to enable controls.</div>
                 </div>
 
                 <form id="modForm" class="space-y-4">
@@ -319,7 +312,6 @@
                 </form>
 
                 <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-                <div id="emptyState" class="hidden">No mods logged yet. Add one above.</div>
             </div>
 
             <div id="statusMessage" class="text-center text-sm mt-4" style="height:1rem;"></div>
@@ -346,7 +338,6 @@
         const statusMessage = document.getElementById('statusMessage');
         const addBtn = document.getElementById('addBtn');
         const modGrid = document.getElementById('modGrid');
-        const emptyState = document.getElementById('emptyState');
         const modForm = document.getElementById('modForm');
 
         let db;
@@ -356,12 +347,13 @@
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
+        const obsOfflineMsg = document.getElementById('obsOfflineMsg');
         let activeRecordingState = 'idle';
+        let obsConnected = false;
 
         function setObsBadge(msg, color) {
             obsBadge.textContent = 'OBS: ' + msg;
             obsBadge.style.color = color || 'var(--color-text-muted)';
-            obsBadge.style.borderColor = color || 'var(--color-border)';
         }
 
         function setButtonRecordingState(state) {
@@ -381,6 +373,17 @@
                 dynoRecBtn.classList.remove('is-recording');
                 dynoRecBtn.lastChild.textContent = ' Start Dyno Pull Recording';
                 dynoRecBtn.disabled = false;
+            }
+            updateControlsAvailability();
+        }
+
+        function updateControlsAvailability() {
+            if (!obsConnected) {
+                loadingRecBtn.disabled = true;
+                dynoRecBtn.disabled = true;
+                obsOfflineMsg.style.display = 'block';
+            } else {
+                obsOfflineMsg.style.display = 'none';
             }
         }
 
@@ -416,7 +419,6 @@
         function setBadge(msg, color) {
             statusBadge.textContent = msg;
             statusBadge.style.color = color || 'var(--color-text-muted)';
-            statusBadge.style.borderColor = color || 'var(--color-border)';
         }
 
         function flashMessage(msg, isError) {
@@ -448,12 +450,6 @@
 
         function renderMods(entries) {
             modGrid.innerHTML = '';
-            if (entries.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            emptyState.classList.add('hidden');
-
             entries.forEach(({ id, data }) => {
                 const card = document.createElement('div');
                 card.className = 'mod-card';
@@ -649,6 +645,7 @@
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+                        obsConnected = true;
                         activeRecordingState = data.state || 'idle';
                         
                         setButtonRecordingState(activeRecordingState);
@@ -663,6 +660,11 @@
                         } else {
                             setObsBadge('Ready', '#22c55e');
                         }
+                    } else {
+                        obsConnected = false;
+                        activeRecordingState = 'idle';
+                        setObsBadge('Idle');
+                        setButtonRecordingState(activeRecordingState);
                     }
                 });
 
