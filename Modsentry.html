@@ -345,7 +345,7 @@
                     <!-- Thin Bar (Summary showing latest car) -->
                     <div id="toggleMainSectionBtn" class="thin-bar p-4 flex items-center justify-between cursor-pointer w-full">
                         <div class="flex items-center gap-3 overflow-hidden min-w-0">
-                            <span class="text-xs font-bold uppercase py-1 px-2 rounded flex-shrink-0" style="background: rgba(255, 59, 48, 0.15); color: var(--color-primary);">Latest</span>
+                            <span class="text-xs font-bold uppercase py-1 px-2 rounded flex-shrink-0" style="background: rgba(255, 59, 48, 0.15); color: var(--color-primary);">Current</span>
                             <span id="latestCarText" class="font-semibold text-sm sm:text-base whitespace-nowrap text-ellipsis overflow-hidden min-w-0" style="color: var(--color-text);">Loading...</span>
                             <span id="latestCarHp" class="text-xs sm:text-sm font-bold flex-shrink-0 hidden sm:inline-block" style="color: var(--color-success);"></span>
                         </div>
@@ -446,6 +446,8 @@
         let activeRecordingState = 'idle';
         let obsConnected = false;
         let obsLastSeen = 0; 
+        let currentVehicleId = null;
+        let vehiclesList = [];
 
         function setObsBadge(msg, color) {
             obsBadge.textContent = 'OBS: ' + msg;
@@ -574,7 +576,11 @@
                 hpEl.style.display = 'none';
                 countEl.textContent = "0";
             } else {
-                const latest = entries[0].data;
+                // Find the currently selected vehicle, fallback to the newest if not found
+                let current = entries.find(e => e.id === currentVehicleId);
+                if (!current) current = entries[0];
+                
+                const latest = current.data;
                 titleEl.textContent = buildTitle(latest) || "Unknown Vehicle";
                 
                 if (latest.startHp && latest.endHp) {
@@ -639,10 +645,28 @@
                 <div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Mods:</strong><p class="mods-text">${escapeHtml(activeMods)}</p></div>
                 ${extraHtml}
                 <div class="card-footer">
+                    ${currentVehicleId !== id 
+                        ? `<button type="button" class="card-btn set-current-btn" style="color: var(--color-primary);">Set Current</button>` 
+                        : `<span class="card-btn" style="color: var(--color-success); cursor: default;">Current ✓</span>`}
                     <button type="button" class="card-btn edit-btn">Edit</button>
                     <button type="button" class="card-btn delete-btn">Delete</button>
                 </div>
             `;
+            
+            const setBtn = card.querySelector('.set-current-btn');
+            if (setBtn) {
+                setBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await setDoc(doc(db, "obs_control", "current_vehicle"), { id: id });
+                        flashMessage('Set as current!', false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } catch (err) {
+                        console.error(err);
+                        flashMessage('Failed to set current', true);
+                    }
+                });
+            }
             
             card.querySelector('.edit-btn').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -732,7 +756,8 @@
                 const entries = [];
                 snapshot.forEach(d => entries.push({ id: d.id, data: d.data() }));
                 entries.sort((a, b) => (b.data.createdAt || 0) - (a.data.createdAt || 0));
-                renderMods(entries);
+                vehiclesList = entries;
+                renderMods(vehiclesList);
                 setBadge('Synced', '#34C759');
             } catch (err) {
                 console.error(err);
@@ -777,6 +802,10 @@
             try {
                 const docRef = doc(collection(db, COLLECTION_NAME), Date.now().toString());
                 await setDoc(docRef, newEntry);
+
+                // Auto-set the newly added car as the Current vehicle for OBS
+                await setDoc(doc(db, "obs_control", "current_vehicle"), { id: docRef.id });
+
                 modForm.reset();
                 
                 const detailsPanel = modForm.querySelector('details');
@@ -802,6 +831,20 @@
                 
                 addBtn.disabled = false;
                 loadMods();
+
+                // Listen for changes to the active "Current" vehicle
+                const currentRef = doc(db, "obs_control", "current_vehicle");
+                onSnapshot(currentRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentVehicleId = docSnap.data().id;
+                    } else {
+                        currentVehicleId = null;
+                    }
+                    // Re-render UI to update badge & thin bar
+                    if (vehiclesList.length > 0) {
+                        renderMods(vehiclesList);
+                    }
+                });
 
                 const statusRef = doc(db, "obs_control", "status");
                 
