@@ -358,11 +358,10 @@
                     </div>
 
                     <div class="rec-btn-row">
-                        <button type="button" id="plugToggleBtn" class="rec-btn">
-                            <span class="rec-dot"></span> <span id="plugBtnText">Turn On Plug</span>
+                        <button type="button" id="plugToggleBtn" class="rec-btn" disabled title="Requires local Python Alexa-Remote script to be configured">
+                            <span class="rec-dot"></span> <span id="plugBtnText">Turn Engine Bay Lights On</span>
                         </button>
                     </div>
-                    <div id="plugOfflineMsg" class="offline-msg">Requires Python backend mapping for Alexa.</div>
                 </div>
 
                 <!-- Build List (collapsible) -->
@@ -581,11 +580,11 @@
         function updatePlugUI() {
             if (isPlugOn) {
                 plugToggleBtn.classList.add('is-on');
-                plugBtnText.textContent = 'Turn Off Plug';
+                plugBtnText.textContent = 'Turn Engine Bay Lights Off';
                 setPlugBadge('ON', 'var(--color-success)');
             } else {
                 plugToggleBtn.classList.remove('is-on');
-                plugBtnText.textContent = 'Turn On Plug';
+                plugBtnText.textContent = 'Turn Engine Bay Lights On';
                 setPlugBadge('OFF', 'var(--color-text-muted)');
             }
         }
@@ -603,8 +602,8 @@
                 isPlugOn = (actionStr === 'turn_on');
                 updatePlugUI();
             } catch (err) {
-                console.error("Error sending plug command:", err);
-                flashMessage('Failed to send plug command', true);
+                console.error("Error sending lights command:", err);
+                flashMessage('Failed to send lights command', true);
             }
         }
 
