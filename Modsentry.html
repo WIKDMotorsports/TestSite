@@ -6,11 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Dyno Control</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --color-background: #000000;
@@ -27,14 +27,14 @@
             --font-body: 'Inter', sans-serif;
         }
 
-        html { 
-            box-sizing: border-box; 
+        html {
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             background-color: var(--color-background);
         }
-        
+
         *, *:before, *:after { box-sizing: inherit; }
-        
+
         body {
             font-family: var(--font-body);
             background-color: var(--color-background);
@@ -42,40 +42,40 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             margin: 0;
-            /* Safe area padding for modern phones with notches */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .container { 
-            width: 100%; 
-            margin: 0 auto; 
-            padding: 0.75rem; 
-            max-width: 56rem; 
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0.625rem;
+            max-width: 40rem;
             flex: 1;
         }
-        @media (min-width: 640px) { .container { padding: 1.5rem; } }
+        @media (min-width: 640px) { .container { padding: 1.25rem; max-width: 56rem; } }
 
-        /* General Utilities */
+        /* Utilities */
+        .p-3 { padding: 0.75rem; }
         .p-4 { padding: 1rem; }
         .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
         .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-4 { margin-top: 1rem; }
-        .mt-6 { margin-top: 1.5rem; }
         .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        
+        .mb-3 { margin-bottom: 0.75rem; }
+
         .bg-surface { background-color: var(--color-surface); }
         .border { border-width: 1px; border-style: solid; border-color: var(--color-border); }
         .border-t { border-top-width: 1px; border-top-style: solid; border-top-color: var(--color-border); }
+        .rounded-lg { border-radius: 0.5rem; }
         .rounded-xl { border-radius: 0.75rem; }
         .rounded-2xl { border-radius: 1rem; }
         .shadow-lg { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
-        
+
         .text-center { text-align: center; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
         .text-xs { font-size: 0.75rem; line-height: 1rem; }
@@ -83,45 +83,39 @@
         .font-semibold { font-weight: 600; }
         .uppercase { text-transform: uppercase; }
         .tracking-wider { letter-spacing: 0.05em; }
-        
+
         .hidden { display: none !important; }
         .flex { display: flex; }
         .flex-col { display: flex; flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
-        .w-full { width: 100%; }
-        
-        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
-        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-        .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-        
-        /* Text Truncation Fixes */
         .min-w-0 { min-width: 0; }
         .overflow-hidden { overflow: hidden; }
         .whitespace-nowrap { white-space: nowrap; }
         .text-ellipsis { text-overflow: ellipsis; }
-        
         .cursor-pointer { cursor: pointer; }
-        
+        .w-full { width: 100%; }
+
+        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+        .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.25rem; }
+
         .grid { display: grid; }
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gap-2 { gap: 0.5rem; }
         .gap-3 { gap: 0.75rem; }
-        .gap-4 { gap: 1rem; }
 
         @media (min-width: 640px) {
             .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-        @media (min-width: 768px) { 
+        @media (min-width: 768px) {
             .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
 
-        /* --- Transitions & Animations --- */
-        .transition-colors { transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
         .transition-transform { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-180 { transform: rotate(180deg); }
-        
+
         .form-element {
             background-color: #000000;
             border: 1px solid var(--color-border);
@@ -129,8 +123,7 @@
             border-radius: 0.5rem;
             transition: all 0.2s ease-in-out;
             font-family: var(--font-body);
-            /* CRITICAL: 16px prevents iOS auto-zoom on focus */
-            font-size: 16px !important; 
+            font-size: 16px !important; /* prevents iOS auto-zoom */
             appearance: none;
             -webkit-appearance: none;
         }
@@ -144,10 +137,10 @@
         .btn {
             font-family: var(--font-heading);
             font-weight: 700;
-            font-size: 1.125rem;
+            font-size: 1.05rem;
             text-transform: uppercase;
             border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
+            padding: 0.9rem 1.5rem;
             transition: all 0.15s ease;
             cursor: pointer;
             border: none;
@@ -158,51 +151,41 @@
             -webkit-user-select: none;
             touch-action: manipulation;
         }
-        .btn:active:not(:disabled) {
-            transform: scale(0.96);
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-        }
-        .btn-primary:active:not(:disabled) {
-            background-color: var(--color-primary-active);
-        }
+        .btn:active:not(:disabled) { transform: scale(0.96); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-primary { background-color: var(--color-primary); color: white; }
+        .btn-primary:active:not(:disabled) { background-color: var(--color-primary-active); }
 
         .rec-panel {
-            border: 1px solid var(--color-border); 
+            border: 1px solid var(--color-border);
             border-radius: 1rem;
-            padding: 1.25rem; 
+            padding: 1rem;
             background-color: var(--color-surface);
         }
-        .rec-btn-row { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.75rem; 
+        .rec-btn-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
         }
-        @media (min-width: 640px) {
+        @media (min-width: 480px) {
             .rec-btn-row { flex-direction: row; }
         }
         .rec-btn {
-            flex: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 0.75rem;
-            font-family: var(--font-heading); 
-            font-weight: 700; 
-            font-size: 1.125rem; 
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
             text-transform: uppercase;
-            border-radius: 0.75rem; 
-            padding: 1.25rem 1rem; 
-            cursor: pointer; 
+            border-radius: 0.75rem;
+            padding: 1.1rem 0.75rem;
+            cursor: pointer;
             border: 2px solid var(--color-border);
-            background-color: #000000; 
-            color: var(--color-text); 
+            background-color: #000000;
+            color: var(--color-text);
             transition: all 0.15s ease;
             user-select: none;
             -webkit-user-select: none;
@@ -212,40 +195,65 @@
             transform: scale(0.96);
             background-color: var(--color-surface-hover);
         }
-        .rec-btn:disabled { 
-            opacity: 0.3; 
-            cursor: not-allowed; 
+        .rec-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .rec-btn.is-active {
+            background-color: rgba(255, 69, 58, 0.15);
+            border-color: var(--color-danger);
+            color: #fff;
         }
-        .rec-btn.is-recording { 
-            background-color: rgba(255, 69, 58, 0.15); 
-            border-color: var(--color-danger); 
-            color: #fff; 
+        .rec-btn.is-on {
+            background-color: rgba(52, 199, 89, 0.15);
+            border-color: var(--color-success);
+            color: #fff;
         }
-        .rec-dot { 
-            width: 12px; 
-            height: 12px; 
-            border-radius: 50%; 
-            background-color: var(--color-border); 
-            flex-shrink: 0; 
+
+        .rec-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background-color: var(--color-border);
+            flex-shrink: 0;
             transition: all 0.3s ease;
         }
-        .rec-btn.is-recording .rec-dot { 
-            background-color: var(--color-danger); 
-            animation: rec-pulse 1.2s infinite ease-in-out; 
+        .rec-btn.is-active .rec-dot {
+            background-color: var(--color-danger);
+            animation: rec-pulse 1.2s infinite ease-in-out;
             box-shadow: 0 0 10px var(--color-danger);
         }
-        @keyframes rec-pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.4; } 
+        .rec-btn.is-on .rec-dot {
+            background-color: var(--color-success);
+            box-shadow: 0 0 10px rgba(52, 199, 89, 0.6);
         }
-        
-        .status-stack { display: flex; align-items: center; gap: 0.75rem; justify-content: flex-end; }
-        #statusBadge, #obsBadge {
-            font-size: 0.75rem; font-family: var(--font-body); font-weight: 700;
-            color: var(--color-text-muted); transition: color 0.2s ease;
-            text-transform: uppercase; letter-spacing: 0.05em;
+        @keyframes rec-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
-        
+
+        .offline-msg {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .status-stack {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .badge-text {
+            font-size: 0.7rem;
+            font-family: var(--font-body);
+            font-weight: 700;
+            color: var(--color-text-muted);
+            transition: color 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
         .thin-bar {
             background-color: var(--color-surface);
             user-select: none;
@@ -257,23 +265,23 @@
             background-color: #000000;
             border: 1px solid var(--color-border);
             border-radius: 0.75rem;
-            padding: 1rem;
+            padding: 0.9rem;
         }
         .mod-card h3 {
             margin: 0 0 0.25rem 0;
             font-family: var(--font-heading);
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--color-text);
         }
         .mod-card .hp-line {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--color-success);
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
         .mod-card .mods-text {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--color-text-muted);
             white-space: pre-line;
             margin: 0;
@@ -282,9 +290,9 @@
         .mod-card .card-footer {
             display: flex;
             justify-content: space-between;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding-top: 0.75rem;
+            gap: 0.6rem;
+            margin-top: 0.9rem;
+            padding-top: 0.7rem;
             border-top: 1px solid var(--color-border);
         }
         .card-btn {
@@ -292,7 +300,7 @@
             border: 1px solid var(--color-border);
             color: var(--color-text);
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             padding: 0.5rem;
@@ -307,23 +315,23 @@
         .card-btn:active { transform: scale(0.95); }
         .delete-btn { color: var(--color-danger); border-color: rgba(255, 69, 58, 0.3); }
         .save-btn { color: var(--color-success); border-color: rgba(52, 199, 89, 0.3); }
-        
+
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="antialiased">
     <div class="container">
-        <div class="bg-surface border rounded-2xl shadow-lg p-3 sm:p-6" style="padding-bottom: 2rem;">
-            <div class="space-y-6">
+        <div class="bg-surface border rounded-2xl shadow-lg p-3" style="padding-bottom: 1.5rem;">
+            <div class="space-y-5">
 
                 <!-- OBS Recording Controls -->
-                <div class="rec-panel space-y-4">
-                    <div class="flex flex-row items-center justify-between gap-2">
-                        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: var(--color-text-muted);">Recording</h2>
+                <div class="rec-panel space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider" style="color: var(--color-text-muted);">Recording</h2>
                         <div class="status-stack">
-                            <div id="obsBadge">OBS: Idle</div>
-                            <div id="statusBadge">Connecting...</div>
+                            <div id="obsBadge" class="badge-text">OBS: Idle</div>
+                            <div id="statusBadge" class="badge-text">Connecting...</div>
                         </div>
                     </div>
 
@@ -335,64 +343,76 @@
                             <span class="rec-dot"></span> <span id="dynoBtnText">Dyno Pull Rec</span>
                         </button>
                     </div>
-                    <div id="obsOfflineMsg" class="text-xs text-center mt-2" style="color: var(--color-text-muted); display: none;">
+                    <div id="obsOfflineMsg" class="offline-msg" style="display:none;">
                         Boot up the recording PC to enable controls.
                     </div>
                 </div>
 
-                <div class="mt-6 border border-border rounded-xl overflow-hidden bg-surface">
-                    
-                    <!-- Thin Bar (Summary showing latest car) -->
-                    <div id="toggleMainSectionBtn" class="thin-bar p-4 flex items-center justify-between cursor-pointer w-full">
-                        <div class="flex items-center gap-3 overflow-hidden min-w-0">
+                <!-- Environment Controls (Smart Plug) -->
+                <div class="rec-panel space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider" style="color: var(--color-text-muted);">Environment</h2>
+                        <div class="status-stack">
+                            <div id="plugBadge" class="badge-text">Plug: Not Configured</div>
+                        </div>
+                    </div>
+
+                    <div class="rec-btn-row">
+                        <button type="button" id="plugToggleBtn" class="rec-btn" disabled title="Requires local Python Alexa-Remote script to be configured">
+                            <span class="rec-dot"></span> <span id="plugBtnText">Turn On Plug</span>
+                        </button>
+                    </div>
+                    <div id="plugOfflineMsg" class="offline-msg">Requires Python backend mapping for Alexa.</div>
+                </div>
+
+                <!-- Build List (collapsible) -->
+                <div class="border rounded-xl overflow-hidden bg-surface">
+
+                    <div id="toggleMainSectionBtn" class="thin-bar p-3 flex items-center justify-between cursor-pointer w-full">
+                        <div class="flex items-center gap-2 overflow-hidden min-w-0">
                             <span class="text-xs font-bold uppercase py-1 px-2 rounded flex-shrink-0" style="background: rgba(255, 59, 48, 0.15); color: var(--color-primary);">Current</span>
-                            <span id="latestCarText" class="font-semibold text-sm sm:text-base whitespace-nowrap text-ellipsis overflow-hidden min-w-0" style="color: var(--color-text);">Loading...</span>
-                            <span id="latestCarHp" class="text-xs sm:text-sm font-bold flex-shrink-0 hidden sm:inline-block" style="color: var(--color-success);"></span>
+                            <span id="latestCarText" class="font-semibold text-sm whitespace-nowrap text-ellipsis overflow-hidden min-w-0" style="color: var(--color-text);">Loading...</span>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0" style="color: var(--color-text-muted);">
+                            <span id="latestCarHp" class="text-xs font-bold flex-shrink-0" style="color: var(--color-success);"></span>
                             <svg id="expandIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="transition-transform" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                             </svg>
                         </div>
                     </div>
 
-                    <!-- Expanded Content (List then Form) -->
                     <div id="mainExpandedContent" class="hidden flex-col">
-                        
-                        <!-- Previous Vehicles List -->
-                        <div class="p-4 border-t border-border" style="background-color: #000000;">
-                            <h3 class="text-xs font-bold uppercase mb-3 tracking-wider" style="color: var(--color-text-muted);">History (<span id="totalVehiclesCount">0</span>)</h3>
-                            <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" style="max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px;">
-                                <!-- Mod Cards injected here -->
-                            </div>
+
+                        <div class="p-3 border-t border-border" style="background-color: #000000;">
+                            <h3 class="text-xs font-bold uppercase mb-2 tracking-wider" style="color: var(--color-text-muted);">History (<span id="totalVehiclesCount">0</span>)</h3>
+                            <div id="modGrid" class="grid gap-2" style="grid-template-columns: 1fr; max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 2px;"></div>
                         </div>
 
-                        <!-- Form Section -->
-                        <div class="p-4 border-t border-border bg-surface">
-                            <h3 class="text-xs font-bold uppercase mb-3 tracking-wider" style="color: var(--color-text-muted);">Add New Entry</h3>
+                        <div class="p-3 border-t border-border bg-surface">
+                            <h3 class="text-xs font-bold uppercase mb-2 tracking-wider" style="color: var(--color-text-muted);">Add New Entry</h3>
                             <form id="modForm" class="space-y-3">
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="grid grid-cols-2 gap-2">
                                     <input type="number" id="year" placeholder="Year" class="form-element w-full px-3 py-3">
                                     <input type="text" id="make" placeholder="Make" required class="form-element w-full px-3 py-3">
-                                    <input type="text" id="model" placeholder="Model" required class="form-element w-full px-3 py-3" style="grid-column: span 2;">
                                 </div>
-                                <div class="grid grid-cols-1 gap-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="model" placeholder="Model" required class="form-element w-full px-3 py-3">
                                     <input type="text" id="trim" placeholder="Trim (e.g. M550i)" class="form-element w-full px-3 py-3">
                                 </div>
-                                <div class="grid grid-cols-2 gap-3">
+                                <div class="grid grid-cols-2 gap-2">
                                     <input type="number" id="startHp" placeholder="Start HP" class="form-element w-full px-3 py-3">
                                     <input type="number" id="endHp" placeholder="End HP" class="form-element w-full px-3 py-3">
                                 </div>
                                 <textarea id="modsList" placeholder="Modifications (one per line)" rows="3" class="form-element w-full px-3 py-3"></textarea>
 
                                 <details class="border rounded-lg overflow-hidden" style="border-color: var(--color-border);">
-                                    <summary class="px-4 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted); background-color: #000;">
+                                    <summary class="px-3 py-3 cursor-pointer text-sm font-semibold" style="color: var(--color-text-muted); background-color: #000;">
                                         + Extra Data (Customer / Post-Tune)
                                     </summary>
                                     <div class="p-3 space-y-3" style="border-top: 1px solid var(--color-border); background-color: var(--color-surface);">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div class="grid grid-cols-2 gap-2">
                                             <input type="text" id="custName" placeholder="Customer Name" class="form-element w-full px-3 py-3">
-                                            <input type="text" id="custIg" placeholder="Instagram (@username)" class="form-element w-full px-3 py-3">
+                                            <input type="text" id="custIg" placeholder="Instagram" class="form-element w-full px-3 py-3">
                                         </div>
                                         <textarea id="futureGoals" placeholder="Future Goals" rows="2" class="form-element w-full px-3 py-3"></textarea>
                                         <textarea id="postTuneComments" placeholder="Post-Tune Comments" rows="2" class="form-element w-full px-3 py-3"></textarea>
@@ -414,7 +434,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Maintained exact configuration as requested
         const firebaseConfig = {
             apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
             authDomain: "activity-log-7d4d6.firebaseapp.com",
@@ -427,112 +446,34 @@
 
         const COLLECTION_NAME = "vehicle_mods";
 
-        // Element References
+        // Element references
         const statusBadge = document.getElementById('statusBadge');
         const statusMessage = document.getElementById('statusMessage');
         const addBtn = document.getElementById('addBtn');
         const modGrid = document.getElementById('modGrid');
         const modForm = document.getElementById('modForm');
-        
+
         const obsBadge = document.getElementById('obsBadge');
         const loadingRecBtn = document.getElementById('loadingRecBtn');
         const loadBtnText = document.getElementById('loadBtnText');
         const dynoRecBtn = document.getElementById('dynoRecBtn');
         const dynoBtnText = document.getElementById('dynoBtnText');
         const obsOfflineMsg = document.getElementById('obsOfflineMsg');
-        
+
+        const plugToggleBtn = document.getElementById('plugToggleBtn');
+        const plugBtnText = document.getElementById('plugBtnText');
+        const plugBadge = document.getElementById('plugBadge');
+
         let db;
         let statusTimeout;
         let activeRecordingState = 'idle';
         let obsConnected = false;
-        let obsLastSeen = 0; 
+        let obsLastSeen = 0;
         let currentVehicleId = null;
         let vehiclesList = [];
+        let isPlugOn = false;
 
-        function setObsBadge(msg, color) {
-            obsBadge.textContent = 'OBS: ' + msg;
-            obsBadge.style.color = color || 'var(--color-text-muted)';
-        }
-
-        function setButtonRecordingState(state) {
-            if (state === 'recording_loading') {
-                loadingRecBtn.classList.add('is-recording');
-                loadBtnText.textContent = 'Stop Loading Rec';
-                dynoRecBtn.disabled = true;
-            } else if (state === 'recording_dyno') {
-                dynoRecBtn.classList.add('is-recording');
-                dynoBtnText.textContent = 'Stop Dyno Pull Rec';
-                loadingRecBtn.disabled = true;
-            } else {
-                loadingRecBtn.classList.remove('is-recording');
-                loadBtnText.textContent = 'Start Loading Rec';
-                loadingRecBtn.disabled = !obsConnected;
-                
-                dynoRecBtn.classList.remove('is-recording');
-                dynoBtnText.textContent = 'Start Dyno Pull Rec';
-                dynoRecBtn.disabled = !obsConnected;
-            }
-            updateControlsAvailability();
-        }
-
-        function updateControlsAvailability() {
-            if (!obsConnected) {
-                loadingRecBtn.disabled = true;
-                dynoRecBtn.disabled = true;
-                obsOfflineMsg.style.display = 'block';
-            } else {
-                if(activeRecordingState === 'idle') {
-                    loadingRecBtn.disabled = false;
-                    dynoRecBtn.disabled = false;
-                }
-                obsOfflineMsg.style.display = 'none';
-            }
-        }
-
-        async function sendObsCommand(actionStr) {
-            try {
-                // Keep haptic feedback simulation snappy
-                if(navigator.vibrate) navigator.vibrate(50);
-                
-                await setDoc(doc(db, "obs_control", "command"), {
-                    action: actionStr,
-                    req_id: Date.now()
-                });
-            } catch (err) {
-                console.error("Error sending command:", err);
-                flashMessage('Failed to send command', true);
-            }
-        }
-
-        loadingRecBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (activeRecordingState === 'recording_loading') sendObsCommand('stop');
-            else sendObsCommand('start_loading');
-        });
-
-        dynoRecBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (activeRecordingState === 'recording_dyno') sendObsCommand('stop');
-            else sendObsCommand('start_dyno');
-        });
-
-        const toggleBtn = document.getElementById('toggleMainSectionBtn');
-        const contentArea = document.getElementById('mainExpandedContent');
-        const icon = document.getElementById('expandIcon');
-        
-        toggleBtn.addEventListener('click', () => {
-            const isHidden = contentArea.classList.contains('hidden');
-            if (isHidden) {
-                contentArea.classList.remove('hidden');
-                contentArea.classList.add('flex');
-                icon.classList.add('rotate-180');
-            } else {
-                contentArea.classList.add('hidden');
-                contentArea.classList.remove('flex');
-                icon.classList.remove('rotate-180');
-            }
-        });
-
+        // ---------------- Utility ----------------
         function setBadge(msg, color) {
             statusBadge.textContent = msg;
             statusBadge.style.color = color || 'var(--color-text-muted)';
@@ -557,49 +498,179 @@
 
         function buildTitle(data) {
             const parts = [
-                data.year || data.vehicleYear, 
-                data.make || data.vehicleMake, 
+                data.year || data.vehicleYear,
+                data.make || data.vehicleMake,
                 data.model || data.vehicleModel,
-                data.trim || data.vehicleTrim 
+                data.trim || data.vehicleTrim
             ].filter(Boolean);
             return parts.length > 0 ? parts.join(' ') : (data.ymm || 'Untitled Build');
         }
 
+        // ---------------- OBS Recording ----------------
+        function setObsBadge(msg, color) {
+            obsBadge.textContent = 'OBS: ' + msg;
+            obsBadge.style.color = color || 'var(--color-text-muted)';
+        }
+
+        function setButtonRecordingState(state) {
+            if (state === 'recording_loading') {
+                loadingRecBtn.classList.add('is-active');
+                loadBtnText.textContent = 'Stop Loading Rec';
+                dynoRecBtn.disabled = true;
+            } else if (state === 'recording_dyno') {
+                dynoRecBtn.classList.add('is-active');
+                dynoBtnText.textContent = 'Stop Dyno Pull Rec';
+                loadingRecBtn.disabled = true;
+            } else {
+                loadingRecBtn.classList.remove('is-active');
+                loadBtnText.textContent = 'Start Loading Rec';
+                loadingRecBtn.disabled = !obsConnected;
+
+                dynoRecBtn.classList.remove('is-active');
+                dynoBtnText.textContent = 'Start Dyno Pull Rec';
+                dynoRecBtn.disabled = !obsConnected;
+            }
+            updateObsControlsAvailability();
+        }
+
+        function updateObsControlsAvailability() {
+            if (!obsConnected) {
+                loadingRecBtn.disabled = true;
+                dynoRecBtn.disabled = true;
+                obsOfflineMsg.style.display = 'block';
+            } else {
+                if (activeRecordingState === 'idle') {
+                    loadingRecBtn.disabled = false;
+                    dynoRecBtn.disabled = false;
+                }
+                obsOfflineMsg.style.display = 'none';
+            }
+        }
+
+        async function sendObsCommand(actionStr) {
+            try {
+                if (navigator.vibrate) navigator.vibrate(50);
+                await setDoc(doc(db, "obs_control", "command"), {
+                    action: actionStr,
+                    req_id: Date.now()
+                });
+            } catch (err) {
+                console.error("Error sending command:", err);
+                flashMessage('Failed to send command', true);
+            }
+        }
+
+        loadingRecBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (activeRecordingState === 'recording_loading') sendObsCommand('stop');
+            else sendObsCommand('start_loading');
+        });
+
+        dynoRecBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (activeRecordingState === 'recording_dyno') sendObsCommand('stop');
+            else sendObsCommand('start_dyno');
+        });
+
+        // ---------------- Smart Plug ----------------
+        function setPlugBadge(msg, color) {
+            plugBadge.textContent = 'Plug: ' + msg;
+            plugBadge.style.color = color || 'var(--color-text-muted)';
+        }
+
+        function updatePlugUI() {
+            if (isPlugOn) {
+                plugToggleBtn.classList.add('is-on');
+                plugBtnText.textContent = 'Turn Off Plug';
+                setPlugBadge('ON', 'var(--color-success)');
+            } else {
+                plugToggleBtn.classList.remove('is-on');
+                plugBtnText.textContent = 'Turn On Plug';
+                setPlugBadge('OFF', 'var(--color-text-muted)');
+            }
+        }
+
+        async function sendPlugCommand(actionStr) {
+            try {
+                if (navigator.vibrate) navigator.vibrate(50);
+                // Requires a local Python script (alexapy / alexa-remote2) listening on
+                // this "smart_home/command" document to actually toggle the device.
+                await setDoc(doc(db, "smart_home", "command"), {
+                    target_device: "HD34BX",
+                    action: actionStr,
+                    req_id: Date.now()
+                });
+                isPlugOn = (actionStr === 'turn_on');
+                updatePlugUI();
+            } catch (err) {
+                console.error("Error sending plug command:", err);
+                flashMessage('Failed to send plug command', true);
+            }
+        }
+
+        plugToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isPlugOn) sendPlugCommand('turn_off');
+            else sendPlugCommand('turn_on');
+        });
+
+        // NOTE: plugToggleBtn stays disabled by default (matches original safety behavior).
+        // Remove the `disabled` attribute in the HTML once the Python backend is wired up.
+
+        // ---------------- Collapsible section ----------------
+        const toggleBtn = document.getElementById('toggleMainSectionBtn');
+        const contentArea = document.getElementById('mainExpandedContent');
+        const icon = document.getElementById('expandIcon');
+
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = contentArea.classList.contains('hidden');
+            if (isHidden) {
+                contentArea.classList.remove('hidden');
+                contentArea.classList.add('flex');
+                icon.classList.add('rotate-180');
+            } else {
+                contentArea.classList.add('hidden');
+                contentArea.classList.remove('flex');
+                icon.classList.remove('rotate-180');
+            }
+        });
+
+        // ---------------- Build list rendering ----------------
         function updateThinBar(entries) {
             const titleEl = document.getElementById('latestCarText');
             const hpEl = document.getElementById('latestCarHp');
             const countEl = document.getElementById('totalVehiclesCount');
 
             if (!entries || entries.length === 0) {
-                titleEl.textContent = "No vehicles. Tap expand to add.";
+                titleEl.textContent = "No vehicles. Tap to add.";
                 hpEl.textContent = "";
                 hpEl.style.display = 'none';
                 countEl.textContent = "0";
-            } else {
-                // Find the currently selected vehicle, fallback to the newest if not found
-                let current = entries.find(e => e.id === currentVehicleId);
-                if (!current) current = entries[0];
-                
-                const latest = current.data;
-                titleEl.textContent = buildTitle(latest) || "Unknown Vehicle";
-                
-                if (latest.startHp && latest.endHp) {
-                    hpEl.textContent = `${latest.startHp} ➔ ${latest.endHp} HP`;
-                    hpEl.style.display = 'inline-block';
-                } else {
-                    hpEl.textContent = "";
-                    hpEl.style.display = 'none';
-                }
-                countEl.textContent = entries.length;
+                return;
             }
+
+            let current = entries.find(e => e.id === currentVehicleId);
+            if (!current) current = entries[0];
+
+            const latest = current.data;
+            titleEl.textContent = buildTitle(latest) || "Unknown Vehicle";
+
+            if (latest.startHp && latest.endHp) {
+                hpEl.textContent = `${latest.startHp}\u2192${latest.endHp} HP`;
+                hpEl.style.display = 'inline-block';
+            } else {
+                hpEl.textContent = "";
+                hpEl.style.display = 'none';
+            }
+            countEl.textContent = entries.length;
         }
 
         function renderMods(entries) {
             updateThinBar(entries);
             modGrid.innerHTML = '';
-            
-            if(entries.length === 0) {
-                modGrid.innerHTML = `<div class="text-sm text-center col-span-full py-6" style="color: var(--color-text-muted);">List is empty. Add a vehicle below.</div>`;
+
+            if (entries.length === 0) {
+                modGrid.innerHTML = `<div class="text-sm text-center" style="color: var(--color-text-muted); padding: 1.5rem 0;">List is empty. Add a vehicle below.</div>`;
                 return;
             }
 
@@ -624,7 +695,7 @@
                 const name = data.customerName ? escapeHtml(data.customerName) : '';
                 const ig = data.customerInstagram ? escapeHtml(data.customerInstagram) : '';
                 customerHtml = `<div class="text-xs mb-2" style="color: var(--color-primary); font-weight: 600;">
-                    👤 ${name} ${ig ? `(${ig})` : ''}
+                    \u{1F464} ${name} ${ig ? `(${ig})` : ''}
                 </div>`;
             }
 
@@ -645,14 +716,14 @@
                 <div class="mt-2"><strong class="text-xs uppercase" style="color: var(--color-text-muted);">Mods:</strong><p class="mods-text">${escapeHtml(activeMods)}</p></div>
                 ${extraHtml}
                 <div class="card-footer">
-                    ${currentVehicleId !== id 
-                        ? `<button type="button" class="card-btn set-current-btn" style="color: var(--color-primary);">Set Current</button>` 
-                        : `<span class="card-btn" style="color: var(--color-success); cursor: default;">Current ✓</span>`}
+                    ${currentVehicleId !== id
+                        ? `<button type="button" class="card-btn set-current-btn" style="color: var(--color-primary);">Set Current</button>`
+                        : `<span class="card-btn" style="color: var(--color-success); cursor: default;">Current \u2713</span>`}
                     <button type="button" class="card-btn edit-btn">Edit</button>
                     <button type="button" class="card-btn delete-btn">Delete</button>
                 </div>
             `;
-            
+
             const setBtn = card.querySelector('.set-current-btn');
             if (setBtn) {
                 setBtn.addEventListener('click', async (e) => {
@@ -667,14 +738,14 @@
                     }
                 });
             }
-            
+
             card.querySelector('.edit-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 renderEditCard(card, id, data);
             });
             card.querySelector('.delete-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                if(confirm("Delete this entry?")) deleteEntry(id);
+                if (confirm("Delete this entry?")) deleteEntry(id);
             });
         }
 
@@ -694,9 +765,9 @@
                         <input type="number" class="form-element px-3 py-2 edit-endHp" placeholder="End HP" value="${escapeAttr(data.endHp || '')}">
                     </div>
                     <textarea class="form-element w-full px-3 py-2 edit-mods" rows="2" placeholder="Modifications">${escapeHtml(data.mods || data.priorMods || '')}</textarea>
-                    
+
                     <div class="text-xs uppercase mt-2 font-bold" style="color: var(--color-text-muted);">Extra Info</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <input type="text" class="form-element px-3 py-2 edit-custName" placeholder="Customer Name" value="${escapeAttr(data.customerName || '')}">
                         <input type="text" class="form-element px-3 py-2 edit-custIg" placeholder="Instagram" value="${escapeAttr(data.customerInstagram || '')}">
                     </div>
@@ -708,7 +779,7 @@
                     <button type="button" class="card-btn save-btn">Save</button>
                 </div>
             `;
-            
+
             card.querySelector('.cancel-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 renderViewCard(card, id, data);
@@ -724,7 +795,7 @@
                 year: card.querySelector('.edit-year').value.trim(),
                 make: card.querySelector('.edit-make').value.trim(),
                 model: card.querySelector('.edit-model').value.trim(),
-                trim: card.querySelector('.edit-trim').value.trim(), 
+                trim: card.querySelector('.edit-trim').value.trim(),
                 startHp: card.querySelector('.edit-startHp').value,
                 endHp: card.querySelector('.edit-endHp').value,
                 mods: card.querySelector('.edit-mods').value,
@@ -742,7 +813,7 @@
 
             try {
                 await setDoc(doc(db, COLLECTION_NAME, id), updated);
-                await loadMods(); 
+                await loadMods();
                 flashMessage('Updated!', false);
             } catch (err) {
                 console.error(err);
@@ -782,12 +853,12 @@
             const year = document.getElementById('year').value.trim();
             const make = document.getElementById('make').value.trim();
             const model = document.getElementById('model').value.trim();
-            const trim = document.getElementById('trim').value.trim(); 
+            const trim = document.getElementById('trim').value.trim();
 
             if (!make || !model) return;
 
             const newEntry = {
-                year, make, model, trim, 
+                year, make, model, trim,
                 startHp: document.getElementById('startHp').value,
                 endHp: document.getElementById('endHp').value,
                 mods: document.getElementById('modsList').value,
@@ -807,14 +878,14 @@
                 await setDoc(doc(db, "obs_control", "current_vehicle"), { id: docRef.id });
 
                 modForm.reset();
-                
+
                 const detailsPanel = modForm.querySelector('details');
                 if (detailsPanel) detailsPanel.open = false;
 
                 await loadMods();
                 flashMessage('Added Successfully!', false);
-                
-                if(modGrid) modGrid.scrollTop = 0;
+
+                if (modGrid) modGrid.scrollTop = 0;
             } catch (err) {
                 console.error(err);
                 flashMessage('Save failed', true);
@@ -823,38 +894,31 @@
             }
         });
 
+        // ---------------- Init ----------------
         (function init() {
             try {
                 setBadge('Connecting...');
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                
+
                 addBtn.disabled = false;
                 loadMods();
+                updatePlugUI();
 
                 // Listen for changes to the active "Current" vehicle
                 const currentRef = doc(db, "obs_control", "current_vehicle");
                 onSnapshot(currentRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        currentVehicleId = docSnap.data().id;
-                    } else {
-                        currentVehicleId = null;
-                    }
-                    // Re-render UI to update badge & thin bar
-                    if (vehiclesList.length > 0) {
-                        renderMods(vehiclesList);
-                    }
+                    currentVehicleId = docSnap.exists() ? docSnap.data().id : null;
+                    if (vehiclesList.length > 0) renderMods(vehiclesList);
                 });
 
                 const statusRef = doc(db, "obs_control", "status");
-                
-                // Keep the live listener running to monitor OBS Status
                 onSnapshot(statusRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         obsLastSeen = Date.now();
                         obsConnected = true;
-                        
+
                         activeRecordingState = data.state || 'idle';
                         setButtonRecordingState(activeRecordingState);
 
@@ -873,14 +937,14 @@
                     console.error("Snapshot error:", error);
                 });
 
-                // Polling to mark offline if no heartbeat
+                // Mark OBS offline if no heartbeat received recently
                 setInterval(() => {
                     if (Date.now() - obsLastSeen > 15000) {
                         if (obsConnected) {
                             obsConnected = false;
                             activeRecordingState = 'idle';
                             setObsBadge('Offline', 'var(--color-text-muted)');
-                            setButtonRecordingState('idle'); 
+                            setButtonRecordingState('idle');
                         }
                     }
                 }, 3000);
